@@ -63,6 +63,27 @@
           <div class="footer-menu-item" @click="goToAbout">
             <el-icon><info-filled /></el-icon>
             <span>关于我们</span>
+            <!-- 弹窗 -->
+            <transition name="fade">
+              <div class="popup-mask" v-if="isPopupShow" @click="closePopup">
+                <div class="popup-content" @click.stop>
+                  <button class="close-btn" @click="closePopup">×</button>
+                  <div class="team-info">
+                    <h3>我们的团队</h3>
+                    <p>团队名称：超能女人</p>
+                    <p>团队规模：7 人</p>
+                    <p>团队选题：广工枢纽：AI 驱动的智能校园信息助手</p>
+                    <p>
+                      团队特色：集数据智能、前端美学、系统性能与产品思维于一体的综合型开发团队。
+                    </p>
+                    <p>
+                      团队目标：通过本项目，我们希望以真实需求为出发点，
+                      以AI与前端开发为核心驱动，实现一个可落地、可迭代的校园智能信息平台。让“信息触手可及”，成为校园生活的日常助手。
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </transition>
           </div>
           <div class="footer-menu-item" @click="goToProfile">
             <el-icon><setting /></el-icon>
@@ -107,7 +128,15 @@ const isCollapse = ref(false);
 const router = useRouter();
 
 // 关于我们
-const goToAbout = () => {};
+const isPopupShow = ref(false); // 定义弹窗状态（默认隐藏）
+const goToAbout = () => {
+  // 修改原有的 goToAbout 函数
+  isPopupShow.value = true; // 核心：点击后显示弹窗
+};
+const closePopup = () => {
+  // 关闭弹窗函数
+  isPopupShow.value = false;
+};
 
 // 个人设置
 const goToProfile = () => {};
@@ -232,5 +261,79 @@ const logout = () => {
 .sidebar.collapse .el-menu-item i,
 .sidebar.collapse .el-sub-menu__title i {
   margin-right: 0;
+}
+
+/*弹窗样式*/
+.trigger-btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  background: #42b983;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.trigger-btn:hover {
+  background: #359469;
+}
+.popup-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+.popup-content {
+  width: 90%;
+  max-width: 500px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  position: relative;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+.close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 20px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #999;
+}
+.close-btn:hover {
+  color: #333;
+}
+.team-info h3 {
+  margin: 0 0 16px 0;
+  color: #2c3e50;
+  text-align: center;
+}
+.team-info p {
+  margin: 8px 0;
+  color: #666;
+  line-height: 1.6;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.popup-content {
+  transition: transform 0.3s ease;
+}
+.fade-enter-from .popup-content,
+.fade-leave-to .popup-content {
+  transform: scale(0.9);
 }
 </style>
