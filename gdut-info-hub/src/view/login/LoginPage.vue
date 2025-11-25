@@ -97,7 +97,6 @@
         </div>
         <div class="modal-body">
           <p>请重新注册一个新账户</p>
-          <p>注册原账号后密码会被重新覆盖</p>
           <p class="hint">系统暂不支持密码找回功能</p>
         </div>
         <button class="modal-close" @click="showForgotPasswordModal = false">
@@ -170,7 +169,7 @@ const saveUserToStorage = (username, password) => {
 // 检查用户名是否已存在
 const isUsernameExists = (username) => {
   const users = getUsersFromStorage();
-  return users.hasOwnProperty(username);
+  return !!users[username];
 };
 
 // 验证登录凭据
@@ -182,12 +181,12 @@ const validateCredentials = (username, password) => {
 // 表单验证
 const validateForm = () => {
   let isValid = true;
-
+  console.log(isUsernameExists(form.username));
   // 验证用户名
   if (form.username.trim() === "") {
     errors.username = "用户名不能为空";
     isValid = false;
-  } else if (!isLogin && isUsernameExists(form.username)) {
+  } else if (!isLogin.value && isUsernameExists(form.username)) {
     errors.username = "用户名已存在";
     isValid = false;
   } else {
