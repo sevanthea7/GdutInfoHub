@@ -1,12 +1,14 @@
 <script setup>
-import { onMounted } from "vue"; // 正确的生命周期钩子是 onMounted
+import { ref } from "vue";
 
-// 使用 onMounted 生命周期钩子
-onMounted(() => {});
+// 管理需要缓存的组件
+const cachedComponents = ref(["IndexQuestionAnswer"]);
 </script>
 
 <template>
-  <router-view></router-view>
+  <div id="app">
+    <router-view></router-view>
+  </div>
 </template>
 
 <style scoped></style>

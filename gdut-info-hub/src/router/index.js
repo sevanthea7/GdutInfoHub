@@ -17,11 +17,34 @@ const router = createRouter({
       component: () => import("@/view/layout/Layout.vue"),
       redirect: "/index",
       children: [
-        { path: "/index", component: Index },
-        { path: "/noticeAnnouncement", component: NoticeAnnouncement },
-        { path: "/waterElectricService", component: WaterElectricService },
-        { path: "/logisticsRepair", component: LogisticsRepair },
-        { path: "/academicInfo", component: AcademicInfo },
+        {
+          path: "/index",
+          component: Index,
+          name: "IndexQuestionAnswer",
+          meta: {
+            keepAlive: true, // 添加 keepAlive 标记
+          },
+        },
+        {
+          path: "/noticeAnnouncement",
+          component: NoticeAnnouncement,
+          name: "NoticeAnnouncement",
+        },
+        {
+          path: "/waterElectricService",
+          component: WaterElectricService,
+          name: "WaterElectricService",
+        },
+        {
+          path: "/logisticsRepair",
+          component: LogisticsRepair,
+          name: "LogisticsRepair",
+        },
+        {
+          path: "/academicInfo",
+          component: AcademicInfo,
+          name: "AcademicInfo",
+        },
       ],
     },
     {

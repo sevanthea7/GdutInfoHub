@@ -10,6 +10,7 @@ headers = {
 }
 
 save_path = "src/crawler/news_data"
+news_type = 'library_news'
 
 def get_page_urls(page_url):    # 获取当前列表页的所有文章 URL、标题、日期
     resp = requests.get(page_url, headers=headers)
@@ -68,4 +69,4 @@ def crawl_all_pages(start_url): # 抓取所有文章分页
 
 # test lines
 data = crawl_all_pages(start_page)
-save_json(save_path, data)
+save_json(save_path, news_type, data)

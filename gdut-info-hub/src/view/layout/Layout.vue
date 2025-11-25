@@ -1,17 +1,17 @@
 <template>
   <div class="layout-container">
     <!-- 左侧菜单 -->
-    <aside :class="['sidebar', isCollapse ? 'collapse' : '']">
+    <aside :class="['sidebar', { collapse: isCollapse, hidden: isMenuHidden }]">
       <!-- Logo 区域 -->
       <div class="logo">
         <img src="@/assets/images/logo.png" alt="GDUT Hub" />
-        <span v-if="!isCollapse">GDUT Hub</span>
+        <span v-if="!isCollapse && !isMenuHidden">GDUT Hub</span>
       </div>
 
       <!-- 主菜单 -->
       <el-menu
         :default-active="$route.path"
-        :collapse="isCollapse"
+        :collapse="isCollapse || isMenuHidden"
         :default-openeds="['/formMode', '/index']"
         background-color="#f5f5f5"
         text-color="#333"
@@ -22,30 +22,30 @@
       >
         <!-- 问答模式 -->
         <el-menu-item index="/index">
-          <el-icon><chat-line-round /></el-icon>
+          <el-icon><ChatLineRound /></el-icon>
           <span>问答模式</span>
         </el-menu-item>
 
         <!-- 表单模式（带子菜单） -->
         <el-sub-menu index="/formMode">
           <template #title>
-            <el-icon><menu /></el-icon>
+            <el-icon><Menu /></el-icon>
             <span>表单模式</span>
           </template>
           <el-menu-item index="/noticeAnnouncement">
-            <el-icon><document /></el-icon>
+            <el-icon><Document /></el-icon>
             <span>通知公告</span>
           </el-menu-item>
           <el-menu-item index="/waterElectricService">
-            <el-icon><water-drop /></el-icon>
+            <el-icon><Opportunity /></el-icon>
             <span>水电服务</span>
           </el-menu-item>
           <el-menu-item index="/logisticsRepair">
-            <el-icon><tools /></el-icon>
+            <el-icon><Tools /></el-icon>
             <span>后勤报修</span>
           </el-menu-item>
           <el-menu-item index="/academicInfo">
-            <el-icon><reading /></el-icon>
+            <el-icon><Reading /></el-icon>
             <span>教务信息</span>
           </el-menu-item>
         </el-sub-menu>
@@ -61,11 +61,15 @@
           :router="false"
         >
           <div class="footer-menu-item" @click="goToAbout">
-            <el-icon><info-filled /></el-icon>
+            <el-icon><InfoFilled /></el-icon>
             <span>关于我们</span>
             <!-- 弹窗 -->
             <transition name="fade">
-              <div class="popup-mask" v-if="isPopupShow" @click="closePopup">
+              <div
+                class="popup-mask"
+                v-if="isPopupShow"
+                @click.stop="closePopup"
+              >
                 <div class="popup-content" @click.stop>
                   <button class="close-btn" @click="closePopup">×</button>
                   <div class="team-info">
@@ -78,19 +82,22 @@
                     </p>
                     <p>
                       团队目标：通过本项目，我们希望以真实需求为出发点，
-                      以AI与前端开发为核心驱动，实现一个可落地、可迭代的校园智能信息平台。让“信息触手可及”，成为校园生活的日常助手。
+                      以AI与前端开发为核心驱动，实现一个可落地、可迭代
+                      的校园智能信息平台。让“信息触手可及”，成为校园生
+                      活的日常助手。
                     </p>
+                    <p>更新情况：初始框架和基础页面路由</p>
                   </div>
                 </div>
               </div>
             </transition>
           </div>
           <div class="footer-menu-item" @click="goToProfile">
-            <el-icon><setting /></el-icon>
+            <el-icon><Setting /></el-icon>
             <span>个人设置</span>
           </div>
           <div class="footer-menu-item" @click="logout">
-            <el-icon><switch-button /></el-icon>
+            <el-icon><SwitchButton /></el-icon>
             <span>退出登录</span>
           </div>
         </div>
@@ -98,34 +105,142 @@
         <!-- 用户信息 -->
         <div class="user-info">
           <el-avatar :size="30" :src="userAvatar" />
-          <span v-if="!isCollapse">{{ userName }}</span>
+          <span v-if="!isCollapse && !isMenuHidden">{{ userName }}</span>
         </div>
       </div>
     </aside>
 
     <!-- 右侧主内容区 -->
-    <main class="content">
-      <router-view />
+    <main :class="['content', { expanded: isMenuHidden }]">
+      <!-- 菜单切换按钮 - 只在菜单隐藏时显示 -->
+      <div class="menu-toggle" v-if="isMenuHidden" @click="toggleMenu">
+        <el-icon><Expand /></el-icon>
+      </div>
+
+      <!-- 路由视图，添加缓存功能 -->
+      <router-view v-slot="{ Component, route }">
+        <keep-alive :include="cachedComponents">
+          <component
+            :is="Component"
+            :key="route.fullPath"
+            v-if="route.meta.keepAlive"
+          />
+        </keep-alive>
+        <component
+          :is="Component"
+          :key="route.fullPath"
+          v-if="!route.meta.keepAlive"
+        />
+      </router-view>
     </main>
   </div>
+
+  <!-- 个人设置弹窗 -->
+  <el-dialog title="个人设置" v-model="isProfileVisible" width="30%">
+    <!-- 修改姓名密码 -->
+    <div>
+      <el-form label-position="top" :model="{ name: userName }">
+        <el-form-item label="账号">
+          <el-input v-model="newUserName" disabled />
+        </el-form-item>
+        <el-form-item label="新密码">
+          <el-input
+            v-model="newPassword"
+            type="password"
+            placeholder="请输入新密码"
+          />
+        </el-form-item>
+        <el-form-item label="确认密码">
+          <el-input
+            v-model="confirmPassword"
+            type="password"
+            placeholder="请再次输入新密码"
+          />
+        </el-form-item>
+      </el-form>
+    </div>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="isProfileVisible = false">取 消</el-button>
+        <el-button type="primary" @click="comfirmProfile">确 定</el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage, ElMessageBox } from "element-plus";
+import {
+  ChatLineRound,
+  Menu,
+  Document,
+  Tools,
+  Reading,
+  InfoFilled,
+  Setting,
+  SwitchButton,
+  Expand,
+  Opportunity,
+} from "@element-plus/icons-vue";
 
 // 用户信息，从本地获取
 const userName = ref(sessionStorage.getItem("userId") || "未知用户");
 const userAvatar = ref(
   "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
-); // 默认头像
+);
 
-// 菜单折叠状态
+// 菜单状态
 const isCollapse = ref(false);
+const isMenuHidden = ref(false);
 
-// 路由
+// 需要缓存的组件列表
+const cachedComponents = ref([
+  "IndexQuestionAnswer",
+  "NoticeAnnouncement",
+  "WaterElectricService",
+  "LogisticsRepair",
+  "AcademicInfo",
+]);
+
+// 响应式断点 - 只在屏幕缩小时隐藏
+const breakpoints = {
+  sm: 768, // 小屏幕：隐藏菜单
+  md: 1024, // 中等屏幕：折叠菜单
+  lg: 1440, // 大屏幕：正常显示
+};
+
+const isProfileVisible = ref(false);
+const newPassword = ref("");
+const confirmPassword = ref("");
+const newUserName = ref(userName.value);
+
 const router = useRouter();
+
+// 检查屏幕尺寸并更新菜单状态
+const checkScreenSize = () => {
+  const width = window.innerWidth;
+
+  if (width < breakpoints.sm) {
+    // 小屏幕：完全隐藏菜单
+    isMenuHidden.value = true;
+    isCollapse.value = false;
+  } else if (width < breakpoints.md) {
+    // 中等屏幕：折叠菜单（只显示图标）
+    isMenuHidden.value = false;
+    isCollapse.value = true;
+  } else {
+    // 大屏幕：正常显示完整菜单
+    isMenuHidden.value = false;
+    isCollapse.value = false;
+  }
+};
+
+// 切换菜单显示/隐藏
+const toggleMenu = () => {
+  isMenuHidden.value = !isMenuHidden.value;
+};
 
 // 关于我们
 const isPopupShow = ref(false); // 定义弹窗状态（默认隐藏）
@@ -139,7 +254,60 @@ const closePopup = () => {
 };
 
 // 个人设置
-const goToProfile = () => {};
+const goToProfile = () => {
+  isProfileVisible.value = true;
+};
+
+// 确认修改个人信息
+const comfirmProfile = () => {
+  if (newPassword.value.trim() === "") {
+    ElMessage.error("密码不能为空");
+    return;
+  }
+  if (newPassword.value !== confirmPassword.value) {
+    ElMessage.error("两次输入密码不一致");
+    return;
+  }
+
+  saveUserToStorage(newUserName.value, newPassword.value);
+  isProfileVisible.value = false;
+  ElMessage.success("修改成功，请重新登录！");
+  router.push("/login");
+};
+
+// 从本地存储获取用户数据
+const getUsersFromStorage = () => {
+  const users = localStorage.getItem("users");
+  return users ? JSON.parse(users) : {};
+};
+
+const saveUserToStorage = (newUserName, newPassword) => {
+  const users = getUsersFromStorage();
+  const oldUserData = users[userName.value];
+
+  if (!oldUserData) {
+    ElMessage.error("用户数据异常，请重新登录");
+    return;
+  }
+
+  sessionStorage.setItem("userId", newUserName);
+  userName.value = newUserName;
+
+  const finalPassword = newPassword !== "" ? newPassword : oldUserData.password;
+
+  const newUserData = { password: finalPassword };
+
+  if (newUserName === userName.value) {
+    users[newUserName] = newUserData;
+  } else {
+    users[newUserName] = newUserData;
+    delete users[userName.value];
+  }
+
+  localStorage.setItem("users", JSON.stringify(users));
+  // 清楚本地缓存的用户信息
+  sessionStorage.removeItem("userId");
+};
 
 // 退出登录
 const logout = () => {
@@ -153,27 +321,51 @@ const logout = () => {
     ElMessage.success("已退出登录");
   });
 };
+
+// 生命周期
+onMounted(() => {
+  checkScreenSize();
+  window.addEventListener("resize", checkScreenSize);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", checkScreenSize);
+});
 </script>
 
 <style scoped>
 .layout-container {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
   overflow: hidden;
 }
 
+/* 侧边栏样式 */
 .sidebar {
-  width: 240px;
-  background-color: #f5f5f5;
-  transition: width 0.3s ease;
+  width: 18%;
+  min-width: 200px;
+  background-color: #f3f4f6 !important;
+  transition: all 0.3s ease;
   overflow-y: auto;
-  border-right: 1px solid #ddd;
   display: flex;
   flex-direction: column;
+  position: fixed;
+  height: 100vh;
+  z-index: 1000;
 }
 
+/* 折叠状态 - 只显示图标 */
 .sidebar.collapse {
   width: 64px;
+  min-width: 64px;
+}
+
+/* 隐藏状态 */
+.sidebar.hidden {
+  transform: translateX(-100%);
+  width: 0;
+  min-width: 0;
+  opacity: 0;
 }
 
 .logo {
@@ -184,39 +376,56 @@ const logout = () => {
   font-weight: bold;
   color: #333;
   border-bottom: 1px solid #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  height: 80px;
+  box-sizing: border-box;
 }
 
 .logo img {
   width: 45px;
   height: 42px;
   margin-right: 10px;
+  flex-shrink: 0;
 }
 
 /* 主菜单样式 */
 .custom-menu {
   border-right: none;
-  flex: 1; /* 让主菜单占据剩余空间 */
+  flex: 1;
+  transition: all 0.3s ease;
 }
 
-/* 自定义选中状态：添加蓝色边框 */
-.custom-menu .el-menu-item.is-active {
+/* 确保图标在折叠状态下正常显示 */
+.custom-menu :deep(.el-menu-item),
+.custom-menu :deep(.el-sub-menu__title) {
+  display: flex;
+  align-items: center;
+}
+
+.custom-menu :deep(.el-icon) {
+  flex-shrink: 0;
+  margin-right: 12px;
+}
+
+/* 折叠状态下调整图标间距 */
+.sidebar.collapse .custom-menu :deep(.el-icon) {
+  margin-right: 0;
+}
+
+/* 自定义选中状态 */
+.custom-menu :deep(.el-menu-item.is-active) {
   border-left: 4px solid #0056b3;
   background-color: rgba(0, 86, 179, 0.12) !important;
   transition: all 0.3s ease;
 }
 
-/* 折叠时的选中状态 */
-.sidebar.collapse .custom-menu .el-menu-item.is-active {
-  margin: 4px 2px; /* 折叠时边距更小 */
-}
-
-/* 子菜单项的选中状态 */
-.custom-menu .el-sub-menu .el-menu-item.is-active {
+.custom-menu :deep(.el-sub-menu .el-menu-item.is-active) {
   border-left: 4px solid #0056b3;
   background-color: rgba(0, 86, 179, 0.12) !important;
 }
 
-/* 底部用户信息与菜单区域 */
+/* 底部区域 */
 .footer-section {
   color: #404040;
   cursor: pointer;
@@ -233,6 +442,8 @@ const logout = () => {
   align-items: center;
   gap: 10px;
   padding: 10px 0;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .user-info span {
@@ -243,24 +454,114 @@ const logout = () => {
 .footer-menu {
   border-top: 1px solid #eee;
 }
+
 .footer-menu-item {
   font-size: 16px;
-  padding: 5px 0;
+  padding: 8px 0;
   color: #404040;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  transition: color 0.3s ease;
 }
 
 .footer-menu-item:hover {
   color: #0056b3;
 }
-/* 折叠时隐藏文字 */
+
+/* 折叠时隐藏文字但保持图标 */
 .sidebar.collapse .el-menu-item span,
-.sidebar.collapse .el-sub-menu__title span {
+.sidebar.collapse .el-sub-menu__title span,
+.sidebar.collapse .logo span,
+.sidebar.collapse .user-info span,
+.sidebar.collapse .footer-menu-item span {
   display: none;
 }
 
-.sidebar.collapse .el-menu-item i,
-.sidebar.collapse .el-sub-menu__title i {
-  margin-right: 0;
+/* 确保折叠状态下图标居中 */
+.sidebar.collapse .custom-menu :deep(.el-menu-item),
+.sidebar.collapse .custom-menu :deep(.el-sub-menu__title) {
+  justify-content: center;
+  padding-left: 0 !important;
+}
+
+/* 主内容区域 */
+.content {
+  flex: 1;
+  margin-left: 18%;
+  background-color: #ffffff;
+  transition: all 0.3s ease;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* 折叠状态下的内容区域 */
+.sidebar.collapse ~ .content {
+  margin-left: 64px;
+}
+
+/* 菜单隐藏时的内容区域 */
+.content.expanded {
+  margin-left: 0;
+  width: 100%;
+}
+
+/* 菜单切换按钮 */
+.menu-toggle {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 999;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+}
+
+.menu-toggle:hover {
+  background: #f5f5f5;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* 响应式设计 */
+@media (max-width: 767px) {
+  .sidebar:not(.hidden) {
+    width: 100%;
+    z-index: 2000;
+  }
+
+  .content {
+    margin-left: 0;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .sidebar {
+    width: 64px;
+  }
+
+  .content {
+    margin-left: 64px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .sidebar {
+    width: 18%;
+  }
+
+  .content {
+    margin-left: 18%;
+  }
 }
 
 /*弹窗样式*/
@@ -291,13 +592,20 @@ const logout = () => {
 }
 .popup-content {
   width: 90%;
-  max-width: 500px;
+  max-width: 600px;
+  min-height: 400px;
   background: #fff;
   border-radius: 8px;
-  padding: 24px;
+  padding: 32px; /* 增加内边距，给换行留更多空间 */
   position: relative;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  /* 以下 3 行是换行核心，必须保留 */
+  word-wrap: break-word; /* 允许长文本换行 */
+  word-break: break-word; /* 中文优先：在单词/字符间换行（比 break-all 更自然） */
+  white-space: normal; /* 清除可能存在的 white-space: nowrap（阻止换行的元凶） */
 }
+
 .close-btn {
   position: absolute;
   top: 16px;
@@ -317,9 +625,12 @@ const logout = () => {
   text-align: center;
 }
 .team-info p {
-  margin: 8px 0;
+  margin: 12px 0;
   color: #666;
-  line-height: 1.6;
+  line-height: 1.8;
+  font-size: 15px;
+  /* 可选：限制每行列数，避免极端情况下单行过长 */
+  max-width: 100%;
 }
 .fade-enter-from,
 .fade-leave-to {
