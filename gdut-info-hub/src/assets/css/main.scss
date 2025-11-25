@@ -62,3 +62,23 @@ button {
   transform: translateX(30px);
   opacity: 0;
 }
+
+/* 全局滚动条样式 */
+::-webkit-scrollbar {
+  width: 7px; /* 垂直滚动条宽度 */
+  height: 8px; /* 水平滚动条高度（如需要） */
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* 滚动条轨道背景 */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1; /* 滚动条滑块颜色 */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8; /* 滑块悬停颜色 */
+}
