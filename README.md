@@ -5,7 +5,7 @@
 git clone https://github.com/sevanthea7/GdutInfoHub.git
 
 进入项目目录
-cd GdutInfoHub
+cd GdutInfoHub/gdut-info-hub
 安装依赖
 ```bash
 # 如果使用 npm
