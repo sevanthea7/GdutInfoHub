@@ -21,6 +21,9 @@ const router = createRouter({
           path: "/index",
           component: Index,
           name: "IndexQuestionAnswer",
+          meta: {
+            keepAlive: true, // 添加 keepAlive 标记
+          },
         },
         {
           path: "/noticeAnnouncement",

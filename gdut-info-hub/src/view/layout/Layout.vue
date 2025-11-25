@@ -110,7 +110,21 @@
         <el-icon><Expand /></el-icon>
       </div>
 
-      <router-view></router-view>
+      <!-- 路由视图，添加缓存功能 -->
+      <router-view v-slot="{ Component, route }">
+        <keep-alive :include="cachedComponents">
+          <component
+            :is="Component"
+            :key="route.fullPath"
+            v-if="route.meta.keepAlive"
+          />
+        </keep-alive>
+        <component
+          :is="Component"
+          :key="route.fullPath"
+          v-if="!route.meta.keepAlive"
+        />
+      </router-view>
     </main>
   </div>
 

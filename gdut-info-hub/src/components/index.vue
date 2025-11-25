@@ -62,7 +62,9 @@ import waterElectricityIcon from "../assets/images/水电服务.png";
 import maintenanceIcon from "../assets/images/后勤报修.png";
 import academicIcon from "../assets/images/教务信息.png";
 import questionAnswerMode from "./questionAnswerMode.vue";
-
+defineOptions({
+  name: "IndexQuestionAnswer",
+});
 const featureIcons = {
   notice: noticeIcon,
   waterElectricity: waterElectricityIcon,
