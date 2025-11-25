@@ -78,8 +78,11 @@
                     </p>
                     <p>
                       团队目标：通过本项目，我们希望以真实需求为出发点，
-                      以AI与前端开发为核心驱动，实现一个可落地、可迭代的校园智能信息平台。让“信息触手可及”，成为校园生活的日常助手。
+                      以AI与前端开发为核心驱动，实现一个可落地、可迭代
+                      的校园智能信息平台。让“信息触手可及”，成为校园生
+                      活的日常助手。
                     </p>
+                    <p>更新情况：初始框架和基础页面路由</p>
                   </div>
                 </div>
               </div>
@@ -585,13 +588,20 @@ onUnmounted(() => {
 }
 .popup-content {
   width: 90%;
-  max-width: 500px;
+  max-width: 600px;
+  min-height: 400px;
   background: #fff;
   border-radius: 8px;
-  padding: 24px;
+  padding: 32px; /* 增加内边距，给换行留更多空间 */
   position: relative;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  /* 以下 3 行是换行核心，必须保留 */
+  word-wrap: break-word; /* 允许长文本换行 */
+  word-break: break-word; /* 中文优先：在单词/字符间换行（比 break-all 更自然） */
+  white-space: normal; /* 清除可能存在的 white-space: nowrap（阻止换行的元凶） */
 }
+
 .close-btn {
   position: absolute;
   top: 16px;
@@ -611,9 +621,12 @@ onUnmounted(() => {
   text-align: center;
 }
 .team-info p {
-  margin: 8px 0;
+  margin: 12px 0;
   color: #666;
-  line-height: 1.6;
+  line-height: 1.8;
+  font-size: 15px;
+  /* 可选：限制每行列数，避免极端情况下单行过长 */
+  max-width: 100%;
 }
 .fade-enter-from,
 .fade-leave-to {
