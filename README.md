@@ -5,7 +5,7 @@
 git clone https://github.com/sevanthea7/GdutInfoHub.git
 
 进入项目目录
-cd GdutInfoHub
+cd GdutInfoHub/gdut-info-hub
 安装依赖
 ```bash
 # 如果使用 npm
@@ -34,3 +34,17 @@ GdutInfoHub/
 ├── package.json        # 项目配置和依赖
 └── vite.config.js      # Vite 构建配置
 ```
+
+
+2. 后端相关库安装
+
+大模型api调用相关：
+```bash
+pip install volcengine-python-sdk[ark]
+```
+
+模块测试：
+```bash
+python -m src.crawler.LLM_api.keywords_agent
+```
+注意不要修改.gitignore中的api_keys.py行，避免api_key泄露。

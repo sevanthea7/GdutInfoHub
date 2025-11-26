@@ -65,7 +65,11 @@
             <span>关于我们</span>
             <!-- 弹窗 -->
             <transition name="fade">
-              <div class="popup-mask" v-if="isPopupShow" @click="closePopup">
+              <div
+                class="popup-mask"
+                v-if="isPopupShow"
+                @click.stop="closePopup"
+              >
                 <div class="popup-content" @click.stop>
                   <button class="close-btn" @click="closePopup">×</button>
                   <div class="team-info">
