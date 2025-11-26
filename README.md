@@ -34,3 +34,11 @@ GdutInfoHub/
 ├── package.json        # 项目配置和依赖
 └── vite.config.js      # Vite 构建配置
 ```
+
+
+2. 后端相关库安装
+
+大模型api调用相关：
+```bash
+pip install volcengine-python-sdk[ark]
+```
