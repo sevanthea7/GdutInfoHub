@@ -4,13 +4,12 @@ from tool_func import save_json
 from urllib.parse import urljoin
 
 # 配置
-start_page = 'https://library.gdut.edu.cn/xwgg/xwdt.htm' 
+START_PAGE = 'https://library.gdut.edu.cn/xwgg/xwdt.htm' 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
 }
 
-save_path = "src/crawler/news_data"
-news_type = 'library_news'
+NEWS_TYPE = 'library_news'
 
 def get_page_urls(page_url):    # 获取当前列表页的所有文章 URL、标题、日期
     resp = requests.get(page_url, headers=headers)
@@ -67,6 +66,6 @@ def crawl_all_pages(start_url): # 抓取所有文章分页
     return results
 
 
-# test lines
-data = crawl_all_pages(start_page)
-save_json(save_path, news_type, data)
+def crawl_library_func(save_path):
+    data = crawl_all_pages(START_PAGE)
+    save_json(save_path, NEWS_TYPE, data)
