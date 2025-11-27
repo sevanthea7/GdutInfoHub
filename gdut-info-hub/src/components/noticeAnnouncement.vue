@@ -438,8 +438,8 @@ watch(totalPages, () => {
   cursor: pointer;
 }
 
-.notice-title:hover {
-  text-decoration: underline;
+.notice-title:hover span:not(.bullet) {
+  text-decoration: underline; /* 仅文字部分显示下划线 */
 }
 
 .notice-title .bullet {
@@ -454,6 +454,7 @@ watch(totalPages, () => {
   color: #b3b3b3;
   font-size: 14px;
   line-height: 1.6;
+  margin-left: 14px;
 }
 
 /* 查看全文链接 */
