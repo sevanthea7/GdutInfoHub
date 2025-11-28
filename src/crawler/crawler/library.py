@@ -59,9 +59,10 @@ def crawl_all_pages(start_url): # 抓取所有文章分页
             article["content"] = get_article_content(article["url"])
             results.append(article)
         
-        resp = requests.get(next_page, headers=headers)
-        resp.encoding = resp.apparent_encoding
-        soup = BeautifulSoup(resp.text, "html.parser")
+        resp_text = get_html(next_page, headers)
+        if resp_text is None:
+            break
+        soup = BeautifulSoup(resp_text, "html.parser")
         next_link = soup.select_one("span.p_next a")
         if next_link:
             next_page = urljoin(next_page, next_link['href'])
