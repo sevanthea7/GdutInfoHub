@@ -6,9 +6,7 @@ from src.crawler.data_clean.time_trans import extract_and_convert_time
 from src.crawler.data_clean.keyword_extractor import search_news_by_keywords
 from src.crawler.data_clean.reprocess import keyword_process
 
-DATA_DIR = 'src/crawler/news_data'
-
-def QA_func(qtext):
+def QA_func(qtext, DATA_DIR):
     qlist = get_user_intension(qtext)
     full_reply = ''
     for q in qlist:

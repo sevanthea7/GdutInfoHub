@@ -1,0 +1,41 @@
+[
+  {
+    "title": "学生相关信息网站汇总",
+    "url": "https://www.gdut.edu.cn/yhxxdh/xs.htm",
+    "date": "",
+    "content": "",
+    "keywords": [
+      "学生相关信息",
+      "网站",
+      "信息"
+    ],
+    "label": "后勤报修",
+    "department": "后勤服务部"
+  },
+  {
+    "title": "后勤维修网页",
+    "url": "http://hqgl.gdut.edu.cn/wechat",
+    "date": "",
+    "content": "报修请点击以下网址链接：http://hqgl.gdut.edu.cn/wechat",
+    "keywords": [
+      "报修",
+      "维修"
+    ],
+    "label": "后勤报修",
+    "department": "后勤服务部"
+  },
+  {
+    "title": "热水故障报修",
+    "url": "",
+    "date": "",
+    "content": "热水问题请根据一下信息进行操作：大学城校区热水故障报修：请微信关注“大学城能源公司”公众号报修（推荐），或致电400-887-6540（每天08:30-23:30）东风路校区及龙洞校区请咨询020-28688878。",
+    "keywords": [
+      "热水故障",
+      "热水",
+      "报修",
+      "维修"
+    ],
+    "label": "后勤报修",
+    "department": "后勤服务部"
+  }
+]

@@ -5,7 +5,7 @@
       <div class="title-group">
         <div class="title-with-icon">
           <img
-            src="@\assets\images\通知公告1.png"
+            src="@/assets/images/通知公告1.png"
             alt="通知公告图标"
             class="notice-icon"
           />
@@ -29,8 +29,11 @@
 
     <!-- 通知列表容器 -->
     <div class="notice-container">
+      <!-- 加载中提示 -->
+      <div v-if="loading" class="empty-tip">加载中...</div>
+
       <!-- 无数据提示 -->
-      <div v-if="currentPageData.length === 0" class="empty-tip">
+      <div v-else-if="currentPageData.length === 0" class="empty-tip">
         暂无相关通知
       </div>
 
@@ -39,7 +42,7 @@
         <div
           class="notice-item"
           v-for="(item, index) in currentPageData"
-          :key="index"
+          :key="item.url"
         >
           <div class="notice-content-wrapper">
             <!-- 标题区域（可跳转） -->
@@ -96,106 +99,52 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
+// 导入API函数
+import { getNoticeList } from "@/api/noticeApi";
 
 // 每页显示条数
 const PAGE_SIZE = ref(6);
 
-// 动态选项卡数据
+// 动态选项卡数据（与后端label对应）
 const tabList = ref([
-  { name: "校园通知", type: "campus" },
-  { name: "学术活动", type: "academic" },
-  { name: "行政通知", type: "administrative" },
-  { name: "社区公告", type: "community" },
+  { name: "校园通知", label: "校园通知" },
+  { name: "学术活动", label: "学术活动" },
+  { name: "行政通知", label: "行政通知" },
+  { name: "社区公告", label: "社区公告" },
 ]);
 
 // 当前激活的选项卡索引
 const activeTab = ref(0);
 
-// 所有通知数据（使用实际抓取的数据结构）
-const allNoticeData = ref([
-  {
-    title: "图书馆召开党总支理论学习中心组学习会",
-    url: "https://library.gdut.edu.cn/info/1128/1917.htm",
-    date: "2025/11/13",
-    content:
-      "11月12日，图书馆召开党总支理论学习中心组学习会。图书馆党总支理论学习中心组成员出席会议，党总支书记赵振辉主持。\n会议集体学习了习近平总书记在广东考察时的重要讲话精神、党的二十届四中全会精神，专题学习了《习近平谈治国理政》第五卷。\n馆长房亚明分享了学习体会，强调要结合图书馆实际和身处一线工作的特点，将习近平总书记在广东考察时的重要讲话精神和党的二十届四中全会精神作为推动工作的重要动能，在真抓实干和服务细节中彰显学校“以生为本”、“爱生如子”的办学理念，扎实做好安全稳定和服务提质工作。副馆长吴池植指出图书馆作为文化传承与创新的重要阵地，需以创新为动力，以服务为宗旨，在文化传承与创新中发挥独特作用。纪检委员张金玲提出全会以推动高质量发展为主题，图书馆应以全会精神为指引，强化责任担当，创新发展，提升履职能力。\n赵振辉以《深入领会核心思想，推进强国复兴伟业》为题讲授专题党课。他从《习近平谈治国理政》第五卷概述、与前四卷内在联系、整体框架把握和学习实践要求等四个方面，进行辅导学习，并要求各个支部通过三会一课等形式组织学习，把学习成果转化为干事创业、推动高质量发展的实际成效。",
-    department: "计算机学院",
-    label: "通知公告",
-    type: "campus",
-  },
-  {
-    title: "2024级新生报到注册通知",
-    url: "https://www.gdut.edu.cn/info/1012/3456.htm",
-    date: "2025/10/04",
-    content:
-      "各位2024级新生及家长：新生报到时间为9月1日-2日（8:00-18:00），报到地点为学校体育馆。需携带身份证、录取通知书、档案材料及近期1寸免冠照片3张，请勿迟到。报到流程：1. 身份核验（携带身份证、录取通知书）；2. 领取校园卡及宿舍钥匙；3. 宿舍入住办理；4. 缴纳相关费用（可微信/支付宝支付）。",
-    department: "学生工作处",
-    label: "通知公告",
-    type: "campus",
-  },
-  {
-    title: "2024级新生报到注册通知",
-    url: "https://www.gdut.edu.cn/info/1012/3456.htm",
-    date: "2025/10/04",
-    content:
-      "各位2024级新生及家长：新生报到时间为9月1日-2日（8:00-18:00），报到地点为学校体育馆。需携带身份证、录取通知书、档案材料及近期1寸免冠照片3张，请勿迟到。报到流程：1. 身份核验（携带身份证、录取通知书）；2. 领取校园卡及宿舍钥匙；3. 宿舍入住办理；4. 缴纳相关费用（可微信/支付宝支付）。",
-    department: "学生工作处",
-    label: "通知公告",
-    type: "campus",
-  },
+// 所有通知数据（从接口获取）
+const allNoticeData = ref([]);
+// 加载状态
+const loading = ref(false);
 
-  {
-    title: "人工智能前沿技术讲座通知",
-    url: "https://www.gdut.edu.cn/info/2034/5678.htm",
-    date: "2025/09/10",
-    content:
-      '特邀清华大学李教授开展人工智能前沿技术讲座，主题为"大模型在科研中的应用"，时间：9月15日14:30-16:30，地点：学术报告厅。欢迎全校师生参加。',
-    department: "科研处",
-    label: "通知公告",
-    type: "academic",
-  },
-  {
-    title: "关于2025年秋季学期选课补选的通知",
-    url: "https://www.gdut.edu.cn/info/3056/7890.htm",
-    date: "2025/10/02",
-    content:
-      "选课补选阶段时间为9月5日-9月8日，请未完成选课的同学登录教务系统及时补选。补选期间不允许退课，逾期将不再受理，请注意选课时间节点。",
-    department: "教务处",
-    label: "通知公告",
-    type: "administrative",
-  },
-  {
-    title: "学生宿舍安全检查通知",
-    url: "https://www.gdut.edu.cn/info/4078/9012.htm",
-    date: "2025/09/08",
-    content:
-      "为保障学生住宿安全，将于9月12日开展全校宿舍安全检查，重点检查违规用电、消防隐患等，请勿私拉乱接电线，妥善保管个人财物。",
-    department: "后勤管理处",
-    label: "通知公告",
-    type: "community",
-  },
-  {
-    title: "学生宿舍安全检查通知",
-    url: "https://www.gdut.edu.cn/info/4078/9012.htm",
-    date: "2025/09/08",
-    content:
-      "为保障学生住宿安全，将于9月12日开展全校宿舍安全检查，重点检查违规用电、消防隐患等，请勿私拉乱接电线，妥善保管个人财物。",
-    department: "后勤管理处",
-    label: "通知公告",
-    type: "community",
-  },
-  {
-    title: "学生宿舍安全检查通知",
-    url: "https://www.gdut.edu.cn/info/4078/9012.htm",
-    date: "2025/09/08",
-    content:
-      "为保障学生住宿安全，将于9月12日开展全校宿舍安全检查，重点检查违规用电、消防隐患等，请勿私拉乱接电线，妥善保管个人财物。",
-    department: "后勤管理处",
-    label: "通知公告",
-    type: "community",
-  },
-]);
+// 获取通知数据
+const fetchNoticeData = async () => {
+  try {
+    loading.value = true;
+    const result = await getNoticeList(); // 调用API函数
+    if (result.code === 200) {
+      allNoticeData.value = result.data.items || [];
+    } else {
+      console.error("获取通知失败:", result.msg);
+      allNoticeData.value = [];
+    }
+  } catch (error) {
+    console.error("接口请求失败:", error);
+    allNoticeData.value = [];
+  } finally {
+    loading.value = false;
+  }
+};
+
+// 页面挂载时获取数据
+onMounted(() => {
+  fetchNoticeData();
+});
 
 // 获取内容预览（截取前100个字符）
 const getPreviewContent = (content) => {
@@ -209,10 +158,10 @@ const getPreviewContent = (content) => {
   return plainText;
 };
 
-// 当前分类的所有通知数据
+// 当前分类的所有通知数据（通过label筛选）
 const filteredNotices = computed(() => {
-  const currentType = tabList.value[activeTab.value].type;
-  return allNoticeData.value.filter((notice) => notice.type === currentType);
+  const currentLabel = tabList.value[activeTab.value].label;
+  return allNoticeData.value.filter((notice) => notice.label === currentLabel);
 });
 
 // 总数据条数
@@ -455,18 +404,6 @@ watch(totalPages, () => {
   font-size: 14px;
   line-height: 1.6;
   margin-left: 14px;
-}
-
-/* 查看全文链接 */
-.view-full-link {
-  color: #2b6cb0;
-  font-size: 13px;
-  text-decoration: none;
-  margin-left: 8px;
-}
-
-.view-full-link:hover {
-  text-decoration: underline;
 }
 
 /* 右侧元信息区域 */

@@ -42,6 +42,7 @@ GdutInfoHub/
 ```bash
 pip install volcengine-python-sdk[ark]
 pip install jieba
+pip install flask
 ```
 
 
