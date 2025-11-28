@@ -58,60 +58,60 @@ def extract_and_convert_time(input_sentences):
     }
     
     # 2. 处理每个句子
-    result = []
+    # result = []
     today = datetime.now().date()  # 当前日期（仅日期部分，忽略时间）
     
-    for sentence in input_sentences:
+    # for sentence in input_sentences:
         # 提取所有时间关键词（去重）
-        time_keywords = list(set(time_pattern.findall(sentence)))
-        converted_times = []
+    time_keywords = list(set(time_pattern.findall(input_sentences)))
+    converted_times = []
+    
+    for keyword in time_keywords:
+        keyword = keyword.strip()
         
-        for keyword in time_keywords:
-            keyword = keyword.strip()
-            
-            # 3. 处理相对时间（如“明天”“昨天”）
-            if keyword in relative_time_map:
-                offset_days = relative_time_map[keyword]
-                target_date = today + timedelta(days=offset_days)
-                converted_times.append(target_date.strftime("%m月%d日"))
-            
-            # 4. 处理模糊时间（如“最近”“近一周”）
-            elif keyword in fuzzy_time_map:
-                start_offset, end_offset = fuzzy_time_map[keyword]
-                start_date = today + timedelta(days=start_offset)
-                end_date = today + timedelta(days=end_offset)
-                converted_times.append(f"{start_date.strftime('%m月%d日')}-{end_date.strftime('%m月%d日')}")
-            
-            # 5. 处理直接日期（如“11月13日”“十二月十号”“12-05”）
-            else:
-                try:
-                    # 处理短横线格式（如12-05）
-                    if "-" in keyword:
-                        month, day = map(int, keyword.split("-"))
-                    # 处理点格式（如12.05）
-                    if "." in keyword:
-                        month, day = map(int, keyword.split("."))
-                    else:
-                        # 处理中文/数字混合格式（如“十二月十号”“11月13日”）
-                        # 提取月份（替换“月”为分隔符）
-                        month_part = re.search(r"(.*?)[月]", keyword).group(1) if "月" in keyword else ""
-                        # 提取日期（替换“日”“号”为分隔符）
-                        day_part = re.search(r"[月](.*?)[日号]", keyword).group(1) if any(c in keyword for c in ["日", "号"]) else ""
-                        
-                        # 中文数字转阿拉伯数字
-                        month = chinese_num_map.get(month_part, int(month_part) if month_part.isdigit() else 1)
-                        day = chinese_num_map.get(day_part, int(day_part) if day_part.isdigit() else 1)
+        # 3. 处理相对时间（如“明天”“昨天”）
+        if keyword in relative_time_map:
+            offset_days = relative_time_map[keyword]
+            target_date = today + timedelta(days=offset_days)
+            converted_times.append(target_date.strftime("%m月%d日"))
+        
+        # 4. 处理模糊时间（如“最近”“近一周”）
+        elif keyword in fuzzy_time_map:
+            start_offset, end_offset = fuzzy_time_map[keyword]
+            start_date = today + timedelta(days=start_offset)
+            end_date = today + timedelta(days=end_offset)
+            converted_times.append(f"{start_date.strftime('%m月%d日')}-{end_date.strftime('%m月%d日')}")
+        
+        # 5. 处理直接日期（如“11月13日”“十二月十号”“12-05”）
+        else:
+            try:
+                # 处理短横线格式（如12-05）
+                if "-" in keyword:
+                    month, day = map(int, keyword.split("-"))
+                # 处理点格式（如12.05）
+                if "." in keyword:
+                    month, day = map(int, keyword.split("."))
+                else:
+                    # 处理中文/数字混合格式（如“十二月十号”“11月13日”）
+                    # 提取月份（替换“月”为分隔符）
+                    month_part = re.search(r"(.*?)[月]", keyword).group(1) if "月" in keyword else ""
+                    # 提取日期（替换“日”“号”为分隔符）
+                    day_part = re.search(r"[月](.*?)[日号]", keyword).group(1) if any(c in keyword for c in ["日", "号"]) else ""
                     
-                    # 构造日期（年份默认为当前年）
-                    target_date = datetime(today.year, month, day).date()
-                    # 若日期已过（如当前12月，输入“1月5日”，自动视为明年）
-                    if target_date < today and month < today.month:
-                        target_date = datetime(today.year + 1, month, day).date()
-                    converted_times.append(target_date.strftime("%m月%d日"))
-                except (ValueError, AttributeError):
-                    # 日期格式错误时，保留原关键词
-                    converted_times.append(f"无法识别：{keyword}")
-        
+                    # 中文数字转阿拉伯数字
+                    month = chinese_num_map.get(month_part, int(month_part) if month_part.isdigit() else 1)
+                    day = chinese_num_map.get(day_part, int(day_part) if day_part.isdigit() else 1)
+                
+                # 构造日期（年份默认为当前年）
+                target_date = datetime(today.year, month, day).date()
+                # 若日期已过（如当前12月，输入“1月5日”，自动视为明年）
+                if target_date < today and month < today.month:
+                    target_date = datetime(today.year + 1, month, day).date()
+                converted_times.append(target_date.strftime("%m月%d日"))
+            except (ValueError, AttributeError):
+                # 日期格式错误时，保留原关键词
+                converted_times.append(f"无法识别：{keyword}")
+    
         # 整理结果
         # 包含原句对比，方便测试
         # result.append({
@@ -119,27 +119,30 @@ def extract_and_convert_time(input_sentences):
         #     "时间关键词": time_keywords,
         #     "具体时间": converted_times if converted_times else ["未提取到时间"]
         # })
-            # 输入大模型
-            result.append(converted_times)
+        
+        for old, new in zip(time_keywords, converted_times):
+            sentence = re.sub(re.escape(old), new, input_sentences)
+        # 输入大模型
+        # result.append(converted_times)
     
-    return result
+    return sentence
 
 # ------------------------------ 测试示例 ------------------------------
 if __name__ == "__main__":
     # 测试输入句子列表
-    test_sentences = [
-        "明天图书馆有什么活动？",
-        "最近宿舍的热水供应时间是几点？",
-        "11月13日的讲座取消了吗？",
-        "十二月十号有没有社团招新？",
-        "昨天忘记去取快递了，后天能补取吗？",
-        "近一周的食堂菜单会更新吗？",
-        "2025年3月20日的会议地点在哪里？",
-        "12-05的考试安排出来了吗？",
-        "本周五下午有体育课吗？",
-        "近一个月的天气预报怎么样？"
-    ]
-    
+    # test_sentences = [
+    #     "明天图书馆有什么活动？",
+    #     "最近宿舍的热水供应时间是几点？",
+    #     "11月13日的讲座取消了吗？",
+    #     "十二月十号有没有社团招新？",
+    #     "昨天忘记去取快递了，后天能补取吗？",
+    #     "近一周的食堂菜单会更新吗？",
+    #     "2025年3月20日的会议地点在哪里？",
+    #     "12-05的考试安排出来了吗？",
+    #     "本周五下午有体育课吗？",
+    #     "近一个月的天气预报怎么样？"
+    # ]
+    test_sentences = "明天图书馆有什么活动？"
     # 执行时间提取与转换
     output = extract_and_convert_time(test_sentences)
     

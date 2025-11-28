@@ -9,25 +9,6 @@ import json
 from src.crawler.LLM_api.create_api_client import client
 
 
-# folder_path = 'src/crawler/news_data'
-
-# if __name__ == "__main__":
-#     client = Ark(
-#     api_key=API_KEY,
-#     base_url="https://ark.cn-beijing.volces.com/api/v3",
-#     )
-#     resp = client.chat.completions.create(
-#         model="doubao-1-5-lite-32k-250115",
-#         messages=[{"content":f"{input_text}.","role":"system"}],
-#         stream=True,
-#     )
-#     for chunk in resp:
-#         if not chunk.choices:
-#             continue
-
-#         print(chunk.choices[0].delta.content, end="")
-
-
 # TODO: 规定system和role在不同应用中的区分,{"content":"hello","role":"user"}
 def create_database_JSON(folder_path):
     for filename in os.listdir(folder_path):
