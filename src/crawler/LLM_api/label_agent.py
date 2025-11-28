@@ -49,5 +49,5 @@ def create_database_JSON(folder_path):
             print(f"已生成 {new_filename}")
 
 
-create_database_JSON()
-print('done!')
+# create_database_JSON()
+# print('done!')
