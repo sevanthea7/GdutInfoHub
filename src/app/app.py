@@ -1,7 +1,10 @@
 from flask import Flask, Response, request, jsonify
 from src.app.QA_main import QA_func
+from src.app.search_by_label import search_news_by_label
 
 app = Flask(__name__)
+
+DATA_DIR = 'src/crawler/news_data'
 
 @app.route("/api/stream", methods=["POST"])
 def api_stream():
@@ -27,15 +30,46 @@ def api_stream():
         return jsonify({"code": 500, "msg": f"传输错误: {str(e)}", "data": None})
 
 
-@app.route("/api/notices", methods=["POST"])
-def notices():
-    # 规定请求体后完成
-    # return jsonify({
-    #     "code": 200,
-    #     "msg": "success",
-    #     "data": {"items": items}
-    # })
-    pass
+@app.route("/api/notices", methods=["GET"])
+def api_notices():
+    items = search_news_by_label('通知公告', DATA_DIR)
+    return jsonify({"code": 200,
+                    "msg": "success", 
+                    "data": {
+                        "items": items
+                        }
+                    })
+
+@app.route("/api/teaching_notices", methods=["GET"])
+def api_teaching_notices():
+    items = search_news_by_label('教务信息', DATA_DIR)
+    return jsonify({"code": 200,
+                    "msg": "success", 
+                    "data": {
+                        "items": items
+                        }
+                    })
+
+@app.route("/api/service_notices", methods=["GET"])
+def api_service_notices():
+    items = search_news_by_label('水电服务', DATA_DIR)
+    return jsonify({"code": 200,
+                    "msg": "success", 
+                    "data": {
+                        "items": items
+                        }
+                    })
+
+@app.route("/api/maintainance_notices", methods=["GET"])
+def api_maintainance_notices():
+    items = search_news_by_label('后勤报修', DATA_DIR)
+    return jsonify({"code": 200,
+                    "msg": "success", 
+                    "data": {
+                        "items": items
+                        }
+                    })
+    
 
 if __name__ == "__main__":
     print("Flask starting...")
