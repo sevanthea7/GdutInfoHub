@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from "vite";
 import path from "path";
 import vue from "@vitejs/plugin-vue";
+import { viteMockServe } from "vite-plugin-mock";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode, command }) => {
@@ -9,7 +10,13 @@ export default defineConfig(({ mode, command }) => {
   return {
     // 自定义根路径 例如 "/web/" "/app/"
     base: VITE_APP_ENV === "development" ? "/" : "/",
-    plugins: [vue()],
+    plugins: [
+      vue(),
+      viteMockServe({
+        mockPath: "mock",
+        enable: true,
+      }),
+    ],
     server: {
       port: 5173,
       host: true,
