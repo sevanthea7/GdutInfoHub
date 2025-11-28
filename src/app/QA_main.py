@@ -1,18 +1,22 @@
 import json
 
 from src.crawler.LLM_api.intention_agent import get_user_intension
+from src.crawler.LLM_api.QA_agent import get_QA_reply
 from src.crawler.data_clean.time_trans import extract_and_convert_time
-from src.crawler.LLM_api.QA_agent import get_info_core
+from src.crawler.data_clean.keyword_extractor import search_news_by_keywords
+from src.crawler.data_clean.reprocess import keyword_process
 
+DATA_DIR = 'src/crawler/news_data'
 
 def QA_func(qtext):
     qlist = get_user_intension(qtext)
     full_reply = ''
     for q in qlist:
-        q = extract_and_convert_time(q)
-        info = get_related_info() # TODO
+        q = extract_and_convert_time(q)                 # 将用户问题中的模糊时间转换成具体日期格式
+        kw = keyword_process(q, is_path=False)          # 提取用户提问中的关键词
+        info = search_news_by_keywords(kw, DATA_DIR)    # 根据关键词在数据中找到相关内容
 
-        for delta in get_info_core(info, q):
+        for delta in get_QA_reply(info, q):
             full_reply += delta
             yield delta
 
@@ -26,3 +30,6 @@ def QA_func(qtext):
         }
     }
     yield json.dumps(end_json)
+
+# for chunk in QA_func('举办过哪些校友相关的活动？'):
+#     print(chunk, end='')

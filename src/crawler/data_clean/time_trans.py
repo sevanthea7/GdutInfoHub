@@ -1,7 +1,7 @@
 import re
 from datetime import datetime, timedelta
 
-def extract_and_convert_time(input_sentences):
+def extract_and_convert_time(input_sentence):
     """
     提取句子中的时间关键词，并转换为具体日期（mm月dd日格式）
     
@@ -63,7 +63,7 @@ def extract_and_convert_time(input_sentences):
     
     # for sentence in input_sentences:
         # 提取所有时间关键词（去重）
-    time_keywords = list(set(time_pattern.findall(input_sentences)))
+    time_keywords = list(set(time_pattern.findall(input_sentence)))
     converted_times = []
     
     for keyword in time_keywords:
@@ -119,39 +119,41 @@ def extract_and_convert_time(input_sentences):
         #     "时间关键词": time_keywords,
         #     "具体时间": converted_times if converted_times else ["未提取到时间"]
         # })
-        
+    if len(converted_times) != 0:
         for old, new in zip(time_keywords, converted_times):
-            sentence = re.sub(re.escape(old), new, input_sentences)
+            sentence = re.sub(re.escape(old), new, input_sentence)
+    else:
+        sentence = input_sentence
         # 输入大模型
         # result.append(converted_times)
     
     return sentence
 
 # ------------------------------ 测试示例 ------------------------------
-if __name__ == "__main__":
-    # 测试输入句子列表
-    # test_sentences = [
-    #     "明天图书馆有什么活动？",
-    #     "最近宿舍的热水供应时间是几点？",
-    #     "11月13日的讲座取消了吗？",
-    #     "十二月十号有没有社团招新？",
-    #     "昨天忘记去取快递了，后天能补取吗？",
-    #     "近一周的食堂菜单会更新吗？",
-    #     "2025年3月20日的会议地点在哪里？",
-    #     "12-05的考试安排出来了吗？",
-    #     "本周五下午有体育课吗？",
-    #     "近一个月的天气预报怎么样？"
-    # ]
-    test_sentences = "明天图书馆有什么活动？"
-    # 执行时间提取与转换
-    output = extract_and_convert_time(test_sentences)
-    
-    # 打印结果
-    # for item in output:
-    #     print("-" * 50)
-    #     print(f"句子：{item['句子']}")
-    #     print(f"时间关键词：{item['时间关键词']}")
-    #     print(f"具体时间：{item['具体时间']}")
-    print(output)
+
+# 测试输入句子列表
+# test_sentences = [
+#     "明天图书馆有什么活动？",
+#     "最近宿舍的热水供应时间是几点？",
+#     "11月13日的讲座取消了吗？",
+#     "十二月十号有没有社团招新？",
+#     "昨天忘记去取快递了，后天能补取吗？",
+#     "近一周的食堂菜单会更新吗？",
+#     "2025年3月20日的会议地点在哪里？",
+#     "12-05的考试安排出来了吗？",
+#     "本周五下午有体育课吗？",
+#     "近一个月的天气预报怎么样？"
+# ]
+# test_sentences = "明天图书馆有什么活动？"
+# 执行时间提取与转换
+# output = extract_and_convert_time(test_sentences)
+
+# 打印结果
+# for item in output:
+#     print("-" * 50)
+#     print(f"句子：{item['句子']}")
+#     print(f"时间关键词：{item['时间关键词']}")
+#     print(f"具体时间：{item['具体时间']}")
+# print(output)
 
 # 本周五识别结果为本周，待改进

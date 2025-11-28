@@ -3,8 +3,8 @@ import json
 import re
 import os
 
-folder_path = 'src/crawler/news_data'
-all_contents = []
+# folder_path = 'src/crawler/news_data'
+# all_contents = []
 
 
 def advanced_clean(text):
@@ -24,27 +24,27 @@ def advanced_clean(text):
     text = re.sub(r'(\d{4}-\d{2})-(\d{1})\b', r'\1-0\2', text)  # 补全日期
     return text
 
+# test lines
+# for filename in os.listdir(folder_path):
+#     if filename.endswith('_raw.json'):
+#         file_path = os.path.join(folder_path, filename)
+#         with open(file_path, 'r', encoding='utf-8') as f:
+#             try:
+#                 data = json.load(f)
+#             except json.JSONDecodeError:
+#                 print(f"文件 {filename} 不是有效 JSON，跳过")
+#                 continue
 
-for filename in os.listdir(folder_path):
-    if filename.endswith('_raw.json'):
-        file_path = os.path.join(folder_path, filename)
-        with open(file_path, 'r', encoding='utf-8') as f:
-            try:
-                data = json.load(f)
-            except json.JSONDecodeError:
-                print(f"文件 {filename} 不是有效 JSON，跳过")
-                continue
+#         # 对内容和标题都进行清洗
+#         if 'content' in data:
+#             data['content'] = advanced_clean(data['content'])
+#         if 'title' in data:
+#             data['title'] = advanced_clean(data['title'])
 
-        # 对内容和标题都进行清洗
-        if 'content' in data:
-            data['content'] = advanced_clean(data['content'])
-        if 'title' in data:
-            data['title'] = advanced_clean(data['title'])
+#         new_filename = filename.replace('_raw', '_cleaned')
+#         new_file_path = os.path.join(folder_path, new_filename)
 
-        new_filename = filename.replace('_raw', '_cleaned')
-        new_file_path = os.path.join(folder_path, new_filename)
+#         with open(new_file_path, 'w', encoding='utf-8') as f:
+#             json.dump(data, f, ensure_ascii=False, indent=2)
 
-        with open(new_file_path, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-
-        print(f"已生成 {new_filename}")
+#         print(f"已生成 {new_filename}")
