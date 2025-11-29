@@ -23,7 +23,7 @@ def api_stream():
         if not isinstance(question, str) or question.strip() == "":
             return jsonify({"code": 400, "msg": "字段 'question' 必须是非空字符串", "data": None})
 
-        return Response(QA_func(question), mimetype="text/plain")
+        return Response(QA_func(question, DATA_DIR), mimetype="text/plain")
 
     except Exception as e:
         # 捕获所有错误
