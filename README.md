@@ -38,13 +38,29 @@ GdutInfoHub/
 
 2. 后端相关库安装
 
-大模型api调用相关：
+**环境配置**
 ```bash
 pip install volcengine-python-sdk[ark]
+pip install jieba
+pip install flask
 ```
 
-模块测试：
+
+**接口测试**
 ```bash
-python -m src.crawler.LLM_api.keywords_agent
+python -m src.app.app
 ```
-注意不要修改.gitignore中的api_keys.py行，避免api_key泄露。
+正常启动时会输出类似下方内容。
+```text
+Flask starting...
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:5000
+```
+
+
+python的端口测试命令
+```bash
+python -m src.app.test_app
+```

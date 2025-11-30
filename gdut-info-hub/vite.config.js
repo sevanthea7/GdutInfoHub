@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from "vite";
 import path from "path";
 import vue from "@vitejs/plugin-vue";
+import { viteMockServe } from "vite-plugin-mock";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode, command }) => {
@@ -9,16 +10,22 @@ export default defineConfig(({ mode, command }) => {
   return {
     // 自定义根路径 例如 "/web/" "/app/"
     base: VITE_APP_ENV === "development" ? "/" : "/",
-    plugins: [vue()],
+    plugins: [
+      vue(),
+      viteMockServe({
+        mockPath: "mock",
+        enable: true,
+      }),
+    ],
     server: {
       port: 5173,
       host: true,
       open: true,
       proxy: {
         "/api": {
-          target: "http://10.21.56.119:30222", //后端目标服务器
+          target: "http://127.0.0.1:5000", //后端目标服务器
           changeOrigin: true, //允许跨域请求
-          // rewrite: (path) => path.replace(/^\/api/, ''), //将所有含/api路径的，去掉/api转发给服务器
+          // rewrite: (path) => path.replace(/^\/api/, ""), //将所有含/api路径的，去掉/api转发给服务器
         },
       },
     },

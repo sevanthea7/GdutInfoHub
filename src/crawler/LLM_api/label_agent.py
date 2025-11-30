@@ -1,35 +1,15 @@
 
 # https://www.volcengine.com/docs/82379/1494384?redirect=1&lang=zh
 
-PROMPT = '帮我提炼三个关键词，同时告诉我它属于"通知公告，水电服务，后勤报修，教务信息"中的哪一种？\
-只用给我结果，结果格式为JSON格式{"key_words": "xxx,xxx,xxx", "label": "xxx"}，关键词中间用一个英文逗号分隔。'
+PROMPT = '告诉我它属于"通知公告，水电服务，后勤报修，教务信息"中的哪一种？\
+只用给我结果，结果格式为JSON格式{"label": "xxx"}'
 
 import os
 import json
 from src.crawler.LLM_api.create_api_client import client
 
-
-folder_path = 'src/crawler/news_data'
-
-# if __name__ == "__main__":
-#     client = Ark(
-#     api_key=API_KEY,
-#     base_url="https://ark.cn-beijing.volces.com/api/v3",
-#     )
-#     resp = client.chat.completions.create(
-#         model="doubao-1-5-lite-32k-250115",
-#         messages=[{"content":f"{input_text}.","role":"system"}],
-#         stream=True,
-#     )
-#     for chunk in resp:
-#         if not chunk.choices:
-#             continue
-
-#         print(chunk.choices[0].delta.content, end="")
-
-
-# TODO: 规定system和role在不同应用中的区分,{"content":"hello","role":"user"}
-def create_database_JSON():
+# TODO: 规定system和role在不同应用中的区分
+def create_database_JSON(folder_path):
     for filename in os.listdir(folder_path):
         if filename.endswith('_for_test.json'):  # 正常运行中选择结尾为'_cleaned.json'的文件
             file_path = os.path.join(folder_path, filename)
@@ -54,12 +34,12 @@ def create_database_JSON():
                     json_obj = json.loads(json_return)
 
                     # 填入 data
-                    item["key_words"] = json_obj.get("key_words", [])
+                    # item["key_words"] = json_obj.get("key_words", [])
                     item["label"] = json_obj.get("label", "")
 
-            # 新文件名，把 "_cleaned" 换成 "_database"
-            # new_filename = filename.replace('_cleaned', '_database')
-            new_filename = filename.replace('_for_test', '_for_test_database')    # 此处为测试用例，正常运行用上面那行
+            # 新文件名，把 "_reprocessed" 换成 "_database"
+            new_filename = filename.replace('_reprocessed', '_database')
+            # new_filename = filename.replace('_for_test', '_for_test_database')    # 此处为测试用例，正常运行用上面那行
             new_file_path = os.path.join(folder_path, new_filename)
 
             # 写入新文件
@@ -69,5 +49,5 @@ def create_database_JSON():
             print(f"已生成 {new_filename}")
 
 
-create_database_JSON()
-print('done!')
+# create_database_JSON()
+# print('done!')

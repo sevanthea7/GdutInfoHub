@@ -18,8 +18,8 @@ def keywords_extract(TEXT):
 # 用于保存所有整理后的内容
 all_contents = []
 # TODO: 增加处理不成功的处理方法&返回
-def keyword_process(input_path):
-    if isinstance(input_path, str):
+def keyword_process(input_path, is_path=True):
+    if is_path:
         folder_path = input_path
         # 遍历文件夹里的所有 JSON 文件
         for filename in os.listdir(folder_path):
@@ -62,17 +62,13 @@ def keyword_process(input_path):
                 print(f"已生成 {new_filename}")
         return True # success
 
-    elif isinstance(input_path, list):
-        que_list = input_path
-        kw_list = []
-        for que in que_list:
-            kw = keywords_extract(que)
-            print(kw)
-            kw_list.append(kw)
-        return kw_list
+    else:
+        question = input_path
+        kw = keywords_extract(question)
+        return kw
         
 
 
 # folder_path = 'src/crawler/news_data'
-folder_path= ['图书馆明天会举办的活动', '最近宿舍的热水供应时间']
-keyword_process(folder_path)    # test line
+# folder_path= ['图书馆明天会举办的活动', '最近宿舍的热水供应时间']
+# keyword_process(folder_path)    # test line
