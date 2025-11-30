@@ -24,6 +24,14 @@
           {{ item.content }}
         </div>
       </div>
+      <!-- 流式响应显示区域 -->
+      <div v-if="isStreaming" class="message-item system-message">
+        <div class="message-time">{{ currentTime }}</div>
+        <div class="message-bubble">
+          {{ streamingContent }}
+          <span class="cursor">|</span>
+        </div>
+      </div>
     </div>
 
     <!-- 输入框区域 -->
@@ -36,9 +44,10 @@
           placeholder="请输入内容...（eg.2025寒假放假安排）"
           :show-word-limit="true"
           @keyup.enter="sendQuestion"
+          :disabled="isStreaming"
         />
         <img
-          v-if="userInput.trim() === ''"
+          v-if="userInput.trim() === '' || isStreaming"
           :src="noSend"
           class="custom-suffix-icon"
         />
@@ -59,17 +68,6 @@ import noSend from "../assets/images/noSend.png";
 import send from "../assets/images/send.png";
 import { onActivated, onDeactivated } from "vue";
 
-// 组件激活时的逻辑
-onActivated(() => {
-  console.log("QuestionAnswerMode activated");
-  // 可以在这里恢复滚动位置或其他状态
-});
-
-// 组件停用时的逻辑
-onDeactivated(() => {
-  console.log("QuestionAnswerMode deactivated");
-  // 可以在这里保存状态
-});
 // 接收父组件传递的初始问题内容
 const props = defineProps({
   content: {
@@ -87,41 +85,21 @@ const chatHistory = ref([]);
 // 用户输入框内容
 const userInput = ref("");
 
-// 模拟数据：预设答案（可根据实际后端接口替换）
-const mockAnswers = {
-  "2025寒假放假安排": `
-各位同学：
-2025年寒假自2025年1月10日（星期五）起至2月28日（星期五）止，共49天。
-下学期于2025年3月1日（星期六）报到注册，3月3日（星期一）正式上课。
-请同学们合理安排假期时间，注意安全，按时返校。
-`,
-  新生报到: `
-各位2024级新生及家长：
-新生报到时间为9月1日 - 2日（8:00-18:00），报到地点为学校体育馆。
-需携带身份证、录取通知书、档案材料及近期1寸免冠照片3张。
-逾期未报到将按规定处理。咨询电话：XXX-XXXXXXX。
-`,
-  水电服务: `
-校园水电服务提醒：
-1. 每月1-5日为抄表期，请勿在此期间进行大功率电器操作。
-2. 如遇停水停电，请关注"广工后勤"公众号或拨打后勤服务中心电话：020-XXXXXXX。
-3. 学生宿舍电费可通过"校园一卡通"APP在线充值。
-`,
-  教务信息: `
-教务处重要通知：
-本学期期末考试将于2025年1月6日开始，具体安排请登录教务系统查询。
-补考安排另行通知，请及时关注学院公告。
-`,
-  1: `我收到了你的输入。`,
-};
+// 流式响应相关状态
+const isStreaming = ref(false);
+const streamingContent = ref("");
+const currentTime = ref("");
 
 // 返回主页
 const handleBack = () => {
+  if (isStreaming.value) {
+    // 可以在这里添加取消请求的逻辑
+    console.log("取消流式请求");
+  }
   emit("back");
 };
 
 onMounted(() => {
-  // 初始化：将父组件传入的内容作为第一条用户消息
   if (props.content.trim()) {
     const now = new Date();
     const timeStr = formatTime(now);
@@ -130,63 +108,111 @@ onMounted(() => {
       content: props.content,
       time: timeStr,
     });
-    // 自动回复
-    setTimeout(() => {
-      const answer = getMockAnswer(props.content);
-      chatHistory.value.push({
-        role: "system",
-        content: answer,
-        time: formatTime(new Date()),
-      });
-      // 滚动到底部
-      nextTick(() => {
-        scrollToBottom();
-      });
-    }, 800);
+    sendStreamRequest(props.content);
   }
 });
 
 // 发送问题
 const sendQuestion = () => {
-  if (!userInput.value.trim()) return;
+  if (!userInput.value.trim() || isStreaming.value) return;
 
   const now = new Date();
   const timeStr = formatTime(now);
 
-  // 添加用户消息
   chatHistory.value.push({
     role: "user",
     content: userInput.value,
     time: timeStr,
   });
 
-  // 清空输入框
   const question = userInput.value;
   userInput.value = "";
 
-  // 模拟异步回复
-  setTimeout(() => {
-    const answer = getMockAnswer(question);
-    chatHistory.value.push({
-      role: "system",
-      content: answer,
-      time: formatTime(new Date()),
-    });
-    // 滚动到底部
-    nextTick(() => {
-      scrollToBottom();
-    });
-  }, 800);
+  sendStreamRequest(question);
 };
 
-// 根据关键词匹配模拟答案
-const getMockAnswer = (question) => {
-  for (const key in mockAnswers) {
-    if (question.includes(key)) {
-      return mockAnswers[key];
+// 发送流式请求
+const sendStreamRequest = async (question) => {
+  isStreaming.value = true;
+  streamingContent.value = "";
+  currentTime.value = formatTime(new Date());
+
+  try {
+    const response = await fetch("/api/stream", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ question: question.trim() }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    console.log("响应体:", response);
+    // 处理流式响应
+    await processRealStream(response);
+  } catch (error) {
+    console.error("流式请求错误:", error);
+    streamingContent.value = "抱歉，请求过程中出现错误，请稍后重试。";
+  } finally {
+    completeStreamResponse();
   }
-  return "不好意思，我还没接入接口，没有检索到相关关键词。请重试。";
+};
+
+// 处理真正的流式数据
+const processRealStream = async (response) => {
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder("utf-8");
+  let hasContent = false;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value, { stream: true });
+
+      // 检查状态标记
+      if (chunk.includes("[STATUS]NO_CONTENT")) {
+        streamingContent.value = "抱歉，无法理解您的问题。";
+      } else if (chunk.includes("[STATUS]NO_MATCHING_CONTENT")) {
+        streamingContent.value = "抱歉，未找到相关内容。";
+      } else {
+        hasContent = true;
+        streamingContent.value += chunk;
+      }
+
+      nextTick(scrollToBottom);
+    }
+
+    // 如果整个流式过程都没有实际内容
+    if (!hasContent && !streamingContent.value) {
+      streamingContent.value = "抱歉，未找到相关内容。";
+    }
+  } finally {
+    reader.releaseLock();
+  }
+};
+
+// 完成流式响应
+const completeStreamResponse = () => {
+  if (streamingContent.value) {
+    chatHistory.value.push({
+      role: "system",
+      content: streamingContent.value,
+      time: currentTime.value,
+    });
+  }
+
+  isStreaming.value = false;
+  streamingContent.value = "";
+  currentTime.value = "";
+
+  nextTick(() => {
+    scrollToBottom();
+  });
 };
 
 // 格式化时间显示
@@ -208,7 +234,6 @@ const scrollToBottom = () => {
   }
 };
 </script>
-
 <style scoped>
 .header {
   display: flex;
@@ -236,12 +261,12 @@ const scrollToBottom = () => {
   flex-direction: column;
   align-items: center;
   cursor: pointer;
+}
 
-  img {
-    width: 19px;
-    height: 20px;
-    margin-left: 5px;
-  }
+.back img {
+  width: 19px;
+  height: 20px;
+  margin-left: 5px;
 }
 .qa-container {
   height: 90vh;
@@ -297,7 +322,6 @@ const scrollToBottom = () => {
 
 .user-message .message-bubble {
   background-color: #f0f5fb;
-
   border-top-right-radius: 0;
 }
 
@@ -305,6 +329,23 @@ const scrollToBottom = () => {
   background-color: #f5f5f5;
   border: 1px solid #ddd;
   border-top-left-radius: 0;
+}
+
+/* 流式响应光标效果 */
+.cursor {
+  animation: blink 1s infinite;
+  color: #666;
+}
+
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
 }
 
 .input-area {
@@ -349,5 +390,13 @@ const scrollToBottom = () => {
 
 :deep(.el-textarea .el-input__count) {
   background: transparent;
+}
+
+/* 禁用状态样式 */
+:deep(.el-textarea.is-disabled .el-textarea__inner) {
+  background-color: #f5f7fa;
+  border-color: #e4e7ed;
+  color: #c0c4cc;
+  cursor: not-allowed;
 }
 </style>

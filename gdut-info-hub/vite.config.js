@@ -23,9 +23,9 @@ export default defineConfig(({ mode, command }) => {
       open: true,
       proxy: {
         "/api": {
-          target: "http://10.21.56.119:30222", //后端目标服务器
+          target: "http://127.0.0.1:5000", //后端目标服务器
           changeOrigin: true, //允许跨域请求
-          // rewrite: (path) => path.replace(/^\/api/, ''), //将所有含/api路径的，去掉/api转发给服务器
+          // rewrite: (path) => path.replace(/^\/api/, ""), //将所有含/api路径的，去掉/api转发给服务器
         },
       },
     },
