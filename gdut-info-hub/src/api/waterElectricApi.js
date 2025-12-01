@@ -16,9 +16,9 @@ import axios from "axios";
 // };
 
 // 模拟API请求函数
-export const academicApi = {
+export const waterElectricApi = {
   // 获取教务信息通知
-  waterElectricApi: async () => {
+  getWaterElectricService: async () => {
     try {
       // 实际项目中这里会是真实的API请求
       const response = await axios.get("/api/service_notices");
