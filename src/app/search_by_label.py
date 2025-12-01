@@ -46,8 +46,8 @@ def search_news_by_label(label, folder_path):
 
     num_lb = len(matched_contents)
     print(f'查找到 {label} 内容共 {num_lb} 条！')
-    print(matched_contents[0])
+    # print(matched_contents[0])
     return matched_contents
 
 
-search_news_by_label('通知公告', 'src/crawler/news_data')
+# search_news_by_label('通知公告', 'src/crawler/news_data')
