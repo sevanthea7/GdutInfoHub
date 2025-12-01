@@ -106,12 +106,12 @@ import { getNoticeList } from "@/api/noticeApi";
 // 每页显示条数
 const PAGE_SIZE = ref(6);
 
-// 动态选项卡数据（与后端label对应）
+// 动态选项卡数据（与后端column对应）
 const tabList = ref([
-  { name: "校园通知", label: "校园通知" },
-  { name: "学术活动", label: "学术活动" },
-  { name: "行政通知", label: "行政通知" },
-  { name: "社区公告", label: "社区公告" },
+  { name: "图书馆讯", column: "图书馆讯" },
+  { name: "体育馆讯", column: "体育馆讯" },
+  { name: "通识公告", column: "通识公告" },
+  { name: "党建快讯", column: "党建快讯" },
 ]);
 
 // 当前激活的选项卡索引
@@ -158,10 +158,12 @@ const getPreviewContent = (content) => {
   return plainText;
 };
 
-// 当前分类的所有通知数据（通过label筛选）
+// 当前分类的所有通知数据（通过column筛选）
 const filteredNotices = computed(() => {
-  const currentLabel = tabList.value[activeTab.value].label;
-  return allNoticeData.value.filter((notice) => notice.label === currentLabel);
+  const currentColumn = tabList.value[activeTab.value].column;
+  return allNoticeData.value.filter(
+    (notice) => notice.column === currentColumn
+  );
 });
 
 // 总数据条数

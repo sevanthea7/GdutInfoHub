@@ -6,14 +6,14 @@ urllib3.disable_warnings(InsecureRequestWarning)
 
 from src.crawler.crawler.tool_func import save_json, get_html, parse_detail_page
 
-BASE_URL = 'https://www.gdut.edu.cn/info/'
-START_PAGE = "https://www.gdut.edu.cn/index/tzgg.htm"   # 列表页地址
+BASE_URL = 'https://zzb.gdut.edu.cn/info/'
+START_PAGE = "https://zzb.gdut.edu.cn/tzgg.htm"   # 列表页地址
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
 }
 
-NEWS_TYPE = 'notice_news'
+NEWS_TYPE = 'party_news'
 
 def parse_list_page(url):
     resp_text = get_html(url, headers)
@@ -21,28 +21,34 @@ def parse_list_page(url):
         return []
     soup = BeautifulSoup(resp_text, "html.parser")
 
-    lis = soup.find_all("li")
+    rows = soup.find_all("tr")
 
     results = []
-    for li in lis:
-        a = li.find("a")
+    for tr in rows:
+        a = tr.find("a")
         if not a:
             continue
 
-        link = urljoin(url, a.get("href"))  # 自动补路径
+        link = urljoin(url, a.get("href"))
 
-        # 过滤明显不是文章的链接
+        # 过滤非本站链接
         if not link.startswith(BASE_URL):
             continue
 
         title = a.get_text(strip=True)
-        date_tag = a.find("i")
-        date = date_tag.get_text(strip=True) if date_tag else ""
+
+        # 日期在第二个 td 的 <span> 中
+        # date_td = tr.find_all("td")
+        # date = ""
+        # if len(date_td) >= 3:  # 通常日期在第 3 列
+        #     date_span = date_td[2].find("span")
+        #     if date_span:
+        #         date = date_span.get_text(strip=True)
 
         results.append({
             "title": title,
-            "url": link,
-            "date": date
+            "url": link
+            # "date": date
         })
 
     return results
@@ -58,8 +64,9 @@ def crawl_all_pages(start_url):
         for article in articles:
             print(f"*抓取文章: {article['title']}")
             # 抓取内容页
-            detail = parse_detail_page(article["url"], headers)
+            detail = parse_detail_page(article["url"], headers, True)
             article["content"] = detail["content"]
+            article["date"] = detail["date"]
 
             all_results.append(article)
 
@@ -69,7 +76,7 @@ def crawl_all_pages(start_url):
             break
 
         soup = BeautifulSoup(resp_text, "lxml")
-        next_link = soup.find("a", class_="Next")
+        next_link = soup.find("a", class_="Next", string=lambda x: x and "下页" in x)
 
         if next_link:
             next_page = urljoin(next_page, next_link["href"])
@@ -80,8 +87,8 @@ def crawl_all_pages(start_url):
     return all_results
 
 
-def crawl_notice_func(save_path):
+def crawl_party_func(save_path):
     data = crawl_all_pages(START_PAGE)
     save_json(save_path, NEWS_TYPE, data)
 
-# crawl_notice_func('src/crawler/news_data')
+# crawl_party_func('src/crawler/news_data')

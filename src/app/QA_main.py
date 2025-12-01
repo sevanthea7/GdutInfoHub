@@ -20,14 +20,14 @@ def QA_func(qtext, DATA_DIR):
 
         yield "\n"  # 多问题之间
 
-    end_json = {
-        "code": 200,
-        "msg": "success",
-        "data": {
-            "anwser": full_reply  # 最后给出完整内容
-        }
-    }
-    yield json.dumps(end_json)
+    # end_json = {
+    #     "code": 200,
+    #     "msg": "success",
+    #     "data": {
+    #         "anwser": full_reply  # 最后给出完整内容
+    #     }
+    # }
+    # yield json.dumps(end_json)
 
 # for chunk in QA_func('举办过哪些校友相关的活动？'):
 #     print(chunk, end='')

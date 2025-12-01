@@ -6,14 +6,14 @@ urllib3.disable_warnings(InsecureRequestWarning)
 
 from src.crawler.crawler.tool_func import save_json, get_html, parse_detail_page
 
-BASE_URL = 'https://www.gdut.edu.cn/info/'
-START_PAGE = "https://www.gdut.edu.cn/index/tzgg.htm"   # 列表页地址
+BASE_URL = 'https://tsjy.gdut.edu.cn/info/'
+START_PAGE = "https://tsjy.gdut.edu.cn/xwtz/xwdt.htm"   # 列表页地址
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
 }
 
-NEWS_TYPE = 'notice_news'
+NEWS_TYPE = 'art_news'
 
 def parse_list_page(url):
     resp_text = get_html(url, headers)
@@ -44,6 +44,7 @@ def parse_list_page(url):
             "url": link,
             "date": date
         })
+        # print(date)
 
     return results
 
@@ -69,7 +70,7 @@ def crawl_all_pages(start_url):
             break
 
         soup = BeautifulSoup(resp_text, "lxml")
-        next_link = soup.find("a", class_="Next")
+        next_link = soup.select_one("span.p_next a")
 
         if next_link:
             next_page = urljoin(next_page, next_link["href"])
@@ -80,8 +81,8 @@ def crawl_all_pages(start_url):
     return all_results
 
 
-def crawl_notice_func(save_path):
+def crawl_art_func(save_path):
     data = crawl_all_pages(START_PAGE)
     save_json(save_path, NEWS_TYPE, data)
 
-# crawl_notice_func('src/crawler/news_data')
+# crawl_art_func('src/crawler/news_data')
