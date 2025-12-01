@@ -88,7 +88,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from "vue";
 // api接口
-import { noticeApi } from "@/api/academicApi";
+import { academicApi } from "@/api/academicApi";
 
 // 每页显示条数
 const PAGE_SIZE = ref(6);
@@ -101,7 +101,7 @@ const loading = ref(false);
 const fetchAcademicData = async () => {
   try {
     loading.value = true;
-    const result = await noticeApi.getAcademicInfo(); // 调用接口
+    const result = await academicApi.getAcademicInfo(); // 调用接口
     if (result.code === 200) {
       allNoticeData.value = result.data.items || [];
     } else {

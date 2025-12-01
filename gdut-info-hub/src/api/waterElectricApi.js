@@ -1,16 +1,43 @@
 import axios from "axios";
-import waterElectricServiceMock from "@/mock/mockWaterElectricData";
+// import waterElectricServiceMock from "@/mock/mockWaterElectricData";
+
+// // 模拟API请求函数
+// export const waterElectricApi = {
+//   // 获取水电服务通知
+//   getWaterElectricService: () => {
+//     // 实际项目中这里会是真实的API请求
+//     // return axios.get('/api/water-electric-service');
+//     return new Promise((resolve) => {
+//       setTimeout(() => {
+//         resolve(waterElectricServiceMock);
+//       }, 500); // 模拟网络延迟
+//     });
+//   },
+// };
 
 // 模拟API请求函数
-export const waterElectricApi = {
-  // 获取水电服务通知
-  getWaterElectricService: () => {
-    // 实际项目中这里会是真实的API请求
-    // return axios.get('/api/water-electric-service');
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(waterElectricServiceMock);
-      }, 500); // 模拟网络延迟
-    });
+export const academicApi = {
+  // 获取教务信息通知
+  waterElectricApi: async () => {
+    try {
+      // 实际项目中这里会是真实的API请求
+      const response = await axios.get("/api/service_notices");
+      // 统一处理响应格式，适配页面层的预期（{ code, data, msg }）
+      const result = response.data;
+
+      // 标准化返回格式
+      return {
+        code: result.code ?? result.data?.code ?? 500,
+        data: result.data ?? result, // 兼容数据在根节点或data节点的情况
+        msg: result.msg ?? result.data?.msg ?? "请求异常",
+      };
+    } catch (error) {
+      // 统一处理请求错误（网络错误、超时等）
+      return {
+        code: 500,
+        data: null,
+        msg: error.message || "网络请求失败",
+      };
+    }
   },
 };

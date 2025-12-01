@@ -3,18 +3,18 @@ import path from "path";
 import vue from "@vitejs/plugin-vue";
 import { viteMockServe } from "vite-plugin-mock";
 
-// https://vitejs.dev/config/
 export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, process.cwd());
   const { VITE_APP_ENV } = env;
+
   return {
-    // 自定义根路径 例如 "/web/" "/app/"
     base: VITE_APP_ENV === "development" ? "/" : "/",
     plugins: [
       vue(),
       viteMockServe({
         mockPath: "mock",
-        enable: true,
+        enable: command === "serve" && VITE_APP_ENV === "development", // 仅开发环境启用mock
+        logger: false, // 关闭mock日志（可选）
       }),
     ],
     server: {
@@ -23,23 +23,18 @@ export default defineConfig(({ mode, command }) => {
       open: true,
       proxy: {
         "/api": {
-          target: "http://127.0.0.1:5000", //后端目标服务器
-          changeOrigin: true, //允许跨域请求
-          // rewrite: (path) => path.replace(/^\/api/, ""), //将所有含/api路径的，去掉/api转发给服务器
+          target: "http://127.0.0.1:5000",
+          changeOrigin: true,
+          // 后端接口带/api前缀，无需rewrite！
+          // 如果后端接口不带/api，才需要：rewrite: (path) => path.replace(/^\/api/, "")
         },
       },
     },
     resolve: {
-      // https://cn.vitejs.dev/config/#resolve-alias
       alias: {
-        // 设置路径
         "~": path.resolve(__dirname, "./"),
-        // 设置别名
         "@": path.resolve(__dirname, "./src"),
-        //__dirname,是一个成员，用来动态获取当前文件模块所属的绝对路径（不包含文件名）
-        //__filename，可以动态获取当前文件夹的绝对路径（包含文件名）
       },
-      // https://cn.vitejs.dev/config/#resolve-extensions
       extensions: [".mjs", ".js", ".ts", ".jsx", ".tsx", ".json", ".vue"],
     },
   };
