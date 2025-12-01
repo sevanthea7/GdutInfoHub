@@ -6,14 +6,14 @@ urllib3.disable_warnings(InsecureRequestWarning)
 
 from src.crawler.crawler.tool_func import save_json, get_html, parse_detail_page
 
-BASE_URL = 'https://www.gdut.edu.cn/info/'
-START_PAGE = "https://www.gdut.edu.cn/index/tzgg.htm"   # 列表页地址
+BASE_URL = 'https://tyb.gdut.edu.cn/info/'
+START_PAGE = "https://tyb.gdut.edu.cn/index/tzgg.htm"   # 列表页地址
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
 }
 
-NEWS_TYPE = 'notice_news'
+NEWS_TYPE = 'sports_news'
 
 def parse_list_page(url):
     resp_text = get_html(url, headers)
@@ -21,11 +21,11 @@ def parse_list_page(url):
         return []
     soup = BeautifulSoup(resp_text, "html.parser")
 
-    lis = soup.find_all("li")
+    dds = soup.find_all("dd")
 
     results = []
-    for li in lis:
-        a = li.find("a")
+    for dd in dds:
+        a = dd.find("a")
         if not a:
             continue
 
@@ -36,9 +36,9 @@ def parse_list_page(url):
             continue
 
         title = a.get_text(strip=True)
-        date_tag = a.find("i")
+        date_tag = dd.find("span", class_="fr gray")
         date = date_tag.get_text(strip=True) if date_tag else ""
-
+        
         results.append({
             "title": title,
             "url": link,
@@ -69,7 +69,7 @@ def crawl_all_pages(start_url):
             break
 
         soup = BeautifulSoup(resp_text, "lxml")
-        next_link = soup.find("a", class_="Next")
+        next_link = soup.select_one("span.p_next a")
 
         if next_link:
             next_page = urljoin(next_page, next_link["href"])
@@ -80,8 +80,8 @@ def crawl_all_pages(start_url):
     return all_results
 
 
-def crawl_notice_func(save_path):
+def crawl_sports_func(save_path):
     data = crawl_all_pages(START_PAGE)
     save_json(save_path, NEWS_TYPE, data)
 
-# crawl_notice_func('src/crawler/news_data')
+# crawl_sports_func('src/crawler/news_data')
