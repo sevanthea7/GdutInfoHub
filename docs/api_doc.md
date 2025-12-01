@@ -45,19 +45,10 @@
         "url": "https://library.gdut.edu.cn/info/1128/1917.htm",
         "date": "2025/11/13",
         "content": "11月10日，图书馆召开党总支理论学习中心组学习会，深入学习贯彻习近平新时代中国特色社会主义思想，聚焦高质量发展主题，全体中心组成员参加会议，会议由党总支书记主持。会上，大家围绕学习内容结合工作实际进行了交流研讨，明确了下一步工作方向。",
-        "key_words": ["图书馆", "理论学习", "专题党课"],
-        "label": "校园通知/学术活动/行政通知/社区公告",
-        "department": "图书馆"
+        "department": "图书馆",
+        "column": "图书馆讯/体育馆讯/通识公告/党建快讯"
       },
-      {
-        "title": "2025年度学术讲座安排公示",
-        "url": "https://academic.gdut.edu.cn/info/2025/lecture.htm",
-        "date": "2025/11/12",
-        "content": "...",
-        "key_words": ["学术讲座", "专家", "报名"],
-        "label": "学术活动",
-        "department": "科研处"
-      }
+      ...
     ]
   }
 }
@@ -75,17 +66,9 @@
         "url": "https://library.gdut.edu.cn/info/1128/1917.htm",
         "date": "2025/11/13",
         "content": "...",
-        "key_words": ["图书馆", "理论学习", "专题党课"],
         "department": "图书馆"
       },
-      {
-        "title": "2025年度学术讲座安排公示",
-        "url": "https://academic.gdut.edu.cn/info/2025/lecture.htm",
-        "date": "2025/11/12",
-        "content": "...",
-        "key_words": ["学术讲座", "专家", "报名"],
-        "department": "科研处"
-      }
+      ...
     ]
   }
 }
@@ -93,46 +76,25 @@
 
 
 ### 字段说明  
-| 字段        | 说明                                                                 |
-|-------------|----------------------------------------------------------------------|
-| `title`     | 内容标题                                                             |
-| `url`       | 内容详情链接                                                         |
-| `date`      | 发布日期                                                             |
-| `content`   | 内容详情                                                             |
-| `key_words` | 关键词列表（部分场景未实际使用）                                     |
-| `label`     | 内容标签（仅通知公告页面返回，其他页面无此字段）                     |
-| `department`| 发布部门                                                             |
+| 字段         | 说明                     |
+| ------------ | ------------------------ |
+| `title`      | 内容标题                 |
+| `url`        | 内容详情链接             |
+| `date`       | 发布日期                 |
+| `content`    | 内容详情                 |
+| `department` | 发布部门                 |
+| `column`     | （仅通知公告类）不同栏目 |
 
 
-响应体
 
-```json
-// eg.通知公告
-{
-  "code": 200,
-  "msg": "success",
-  "data": {
-    "items": [
-      {
-        "title": "图书馆召开党总支理论学习中心组学习会",
-        "url": "https://library.gdut.edu.cn/info/1128/1917.htm",
-        "date": "2025/11/13",
-        "content": "xxx",
-        "key_words": ["图书馆", "理论学习", "专题党课"],
-        "label": "通知公告"
-      },
-      {
-        "title": "xxx",
-        "url": "xxx.htm",
-        "date": "2025/11/13",
-        "content": "xxx",
-        "key_words": ["xxx", "xxx", "xxx"],
-        "label": "通知公告"
-      },
-      ...
-    ]
-  }
-}
 
-```
+## 3. 本地网络接口示例
 
+- 问答模块
+  - http://127.0.0.1:5000/api/stream
+
+- 栏目模块
+  - 通知公告：http://127.0.0.1:5000/api/notices
+  - 教务信息：http://127.0.0.1:5000/api/teaching_notices
+  - 水电服务：http://127.0.0.1:5000/api/service_notices
+  - 水电服务：http://127.0.0.1:5000/api/maintainance_notices
