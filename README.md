@@ -1,4 +1,4 @@
-# 软工小组作业
+# 广工枢纽
 
 ### 1、前端项目拉取与启动步骤
 克隆项目到本地
@@ -45,8 +45,8 @@ pip install jieba
 pip install flask
 ```
 
+**启动方式**
 
-**接口测试**
 ```bash
 python -m src.app.app
 ```
@@ -57,10 +57,4 @@ Flask starting...
  * Debug mode: on
 WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
  * Running on http://127.0.0.1:5000
-```
-
-
-python的端口测试命令
-```bash
-python -m src.app.test_app
 ```
