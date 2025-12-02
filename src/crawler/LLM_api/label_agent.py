@@ -1,5 +1,7 @@
-
-# https://www.volcengine.com/docs/82379/1494384?redirect=1&lang=zh
+######################################################################
+# 实际应用中建议通过管理员程序trick进行label标注， 本方法对token的消耗较大
+######################################################################
+# 调用相关官方文档：https://www.volcengine.com/docs/82379/1494384?redirect=1&lang=zh
 
 PROMPT = '告诉我它属于"通知公告，水电服务，后勤报修，教务信息"中的哪一种？\
 只用给我结果，结果格式为JSON格式{"label": "xxx"}'
@@ -8,7 +10,6 @@ import os
 import json
 from src.crawler.LLM_api.create_api_client import client
 
-# TODO: 规定system和role在不同应用中的区分
 def create_database_JSON(folder_path):
     for filename in os.listdir(folder_path):
         if filename.endswith('_for_test.json'):  # 正常运行中选择结尾为'_cleaned.json'的文件
