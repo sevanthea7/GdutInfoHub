@@ -3,6 +3,7 @@ import os
 import pytest
 import json
 import shutil
+import requests
 
 # 把项目根目录加入Python路径（确保能导入src中的tool_func）
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
