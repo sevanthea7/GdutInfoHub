@@ -1,66 +1,150 @@
-# 软工小组作业
+# GdutInfoHub
 
-### 1、前端项目拉取与启动步骤
-克隆项目到本地
+广工枢纽是一个面向校园生活的智能信息聚合平台，旨在帮助师生快速获取校内的各类通知公告、水电服务、后勤报修、教务信息等内容。项目通过自动化爬虫定期从学校通知网及相关部门网站抓取信息，构建统一的校园知识库，并结合大语言模型API，实现基于自然语言的智能问答与信息检索。我们希望让繁杂分散的校园信息实现了自动化聚合与智能化服务，使师生无需频繁浏览多个网站即可快速获取所需内容。项目同时展示了数据采集、知识整理与大模型应用的完整流程，具有较高的可扩展性与实用价值。
+
+## 1. 安装
+
+### 1）脚本安装
+
+该方式适合 **大多数用户**，无需逐条执行命令，只需运行脚本即可完成依赖安装和项目启动。
+
+#### 1️⃣ 使用前准备
+
+请确保本机已安装以下基础环境：
+
+- Node.js
+- Python（建议 3.9+）
+- npm（随 Node.js 安装）
+- pip（随 Python 安装）
+
+------
+
+#### 2️⃣ 克隆项目
+
+```bash
 git clone https://github.com/sevanthea7/GdutInfoHub.git
+```
 
-进入项目目录
+并在克隆的文件夹中打开cmd。
+
+------
+
+#### 3️⃣ 运行环境初始化脚本（首次使用时执行）
+
+该脚本用于 **安装前后端所有依赖**，**只需首次运行一次**。
+
+##### Windows
+
+```powershell
+scripts\setup.ps1
+```
+
+##### Linux / macOS
+
+```bash
+bash scripts/setup.sh
+```
+
+------
+
+#### 4️⃣ 启动项目（每次运行项目时使用）
+
+当依赖已安装完成后，使用启动脚本即可运行项目。
+
+##### Windows
+
+```powershell
+scripts\start.ps1
+```
+
+##### Linux / macOS
+
+```bash
+bash scripts/start.sh
+```
+
+启动后：
+
+- 前端地址：`http://localhost:5173`
+- 后端服务：`http://localhost:5000`
+
+------
+
+#### 📌 脚本使用说明
+
+| 脚本                   | 作用           | 何时使用                      |
+| ---------------------- | -------------- | ----------------------------- |
+| `setup.ps1 / setup.sh` | 安装所有依赖   | **首次运行项目 / 更换环境时** |
+| `start.ps1 / start.sh` | 启动前后端服务 | **每次启动项目时**            |
+
+------
+
+### 2. 手动安装
+
+该方式适合希望**完全理解项目结构**或进行**调试、学习**的用户。
+
+------
+
+### 1️⃣ 克隆项目
+
+```bash
+git clone https://github.com/sevanthea7/GdutInfoHub.git
+```
+
+------
+
+### 2️⃣ 安装依赖（首次使用）
+
+#### 前端依赖
+
+```bash
 cd GdutInfoHub/gdut-info-hub
-安装依赖
-```bash
-# 如果使用 npm
 npm install
-
-# 如果使用 yarn
-yarn install
-
-# 如果使用 pnpm
-pnpm install
 ```
 
-启动开发 npm run dev, 启动成功后，控制台会显示访问地址, 在浏览器中打开该地址即可查看项目。
+#### 后端依赖
 
-前端项目结构说明
 ```bash
-GdutInfoHub/
-├── src/                 # 源代码目录
-│   ├── assets/         # 静态资源
-│   ├── components/     # Vue 组件
-│   ├── views/          # 页面组件
-│   ├── router/         # 路由配置
-│   ├── store/          # 状态管理
-│   └── main.js         # 入口文件
-├── public/             # 公共资源
-├── package.json        # 项目配置和依赖
-└── vite.config.js      # Vite 构建配置
+pip install volcengine-python-sdk[ark] jieba flask
 ```
 
+------
 
-2. 后端相关库安装
+### 3️⃣ 启动项目
 
-**环境配置**
+#### 启动前端
+
 ```bash
-pip install volcengine-python-sdk[ark]
-pip install jieba
-pip install flask
+cd GdutInfoHub/gdut-info-hub
+npm run dev
 ```
 
+#### 启动后端
 
-**接口测试**
 ```bash
 python -m src.app.app
 ```
-正常启动时会输出类似下方内容。
-```text
-Flask starting...
- * Serving Flask app 'app'
- * Debug mode: on
-WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
- * Running on http://127.0.0.1:5000
+
+------
+
+## 3. 项目结构说明
+
+```
+GdutInfoHub
+├── docs/          	  # 文档文件
+├── gdut-info-hub/    # 前端项目
+├── scripts/          # 一键部署与启动脚本
+├── src/              # 后端源码
+├── tests/            # 测试文件
+└── README.md
 ```
 
+------
 
-python的端口测试命令
-```bash
-python -m src.app.test_app
-```
+## 4. 说明
+
+- **推荐普通用户使用脚本方式**，更省时省力
+- **手动方式更适合学习和调试**
+- 两种方式效果完全一致，仅操作流程不同
+
+欢迎提出 Issue 或 PR，一起完善 GdutInfoHub 🚀

@@ -2,7 +2,9 @@
 
 ## 1. 团队会议
 
-==todo补充会议照片==
+因为各成员有不同的课程与实习安排，难以找到大家都在的线下时间，所以采用线上会议代替站立式会议。
+
+![](https://sevanthea7.oss-cn-beijing.aliyuncs.com/QGworks/202512031043184.png)
 
 ### 1）昨天已完成的工作
 
@@ -52,7 +54,85 @@
 
 - 相关联issue见commit记录中`#`后链接内容
 
+  - 相关任务链接：
+
+    https://github.com/sevanthea7/GdutInfoHub/issues/4
+
+    https://github.com/sevanthea7/GdutInfoHub/issues/5
+
+    https://github.com/sevanthea7/GdutInfoHub/issues/6
+
+    https://github.com/sevanthea7/GdutInfoHub/issues/13
+
+    https://github.com/sevanthea7/GdutInfoHub/issues/16
+
+    https://github.com/sevanthea7/GdutInfoHub/issues/26
+
 - 接口文档与返回格式文档见 `docs/api_doc.md` 与 `docs/return_doc.md`
+
+  更新：确定了问答&表单模式接口格式
+
+  ```json
+  // 1. 问答模式
+  // 请求体 body 传参
+  
+  {
+    "question": "xxx" // 用户输入的问题
+  }
+  
+  // 响应体
+  
+  // 在这之前采用流式输出，最后的json用于标记结束
+  {
+    "code": 200, // 400文件错误、500捕获错误
+    "msg": "success",
+    "data": {
+      "anwser": "xxx" // 大模型回答完整内容
+    }
+  }
+  
+  // 2.表单模式
+  //1) 通知公告页面
+  
+  {
+    "code": 200,
+    "msg": "success",
+    "data": {
+      "items": [
+        {
+          "title": "图书馆召开党总支理论学习中心组学习会",
+          "url": "https://library.gdut.edu.cn/info/1128/1917.htm",
+          "date": "2025/11/13",
+          "content": "11月10日，图书馆召开党总支理论学习中心组学习会，深入学习贯彻习近平新时代中国特色社会主义思想，聚焦高质量发展主题，全体中心组成员参加会议，会议由党总支书记主持。会上，大家围绕学习内容结合工作实际进行了交流研讨，明确了下一步工作方向。",
+          "department": "图书馆",
+          "column": "图书馆讯/体育馆讯/通识公告/党建快讯"
+        },
+        ...
+      ]
+    }
+  }
+  
+  //2) 其他三个页面
+  
+  {
+    "code": 200,
+    "msg": "success",
+    "data": {
+      "items": [
+        {
+          "title": "图书馆召开党总支理论学习中心组学习会",
+          "url": "https://library.gdut.edu.cn/info/1128/1917.htm",
+          "date": "2025/11/13",
+          "content": "...",
+          "department": "图书馆"
+        },
+        ...
+      ]
+    }
+  }
+  ```
+
+  
 
 ## 4. 运行截图
 
@@ -60,121 +140,29 @@
 
   - 规定前后端交互方式，尝试对接
 
-    - 相关规定
+    - 相关规定见上方api_doc内容
 
-      ```markdown
-      ## 1. 对话页
-      
-      请求方式：post
-      
-      请求体 body 传参
-      
-      ​```json
-      {
-        "question": "xxx" // 用户输入的问题
-      }
-      ​```
-      
-      响应体
-      
-      ​```json
-      // 在这之前采用流式输出，最后的json用于标记结束
-      {
-        "code": 200, // 400文件错误、500捕获错误
-        "msg": "success",
-        "data": {
-          "anwser": "xxx" // 大模型回答完整内容
-        }
-      }
-      ​```
-      
-      ## 2. 栏目页
-      
-      ### 接口请求说明
-      
-      - **请求方式**：GET  
-      - **请求参数**：无需参数  
-      
-      ### 响应数据示例  
-      
-      #### 1. 通知公告页面  
-      
-      ​```json
-      {
-        "code": 200,
-        "msg": "success",
-        "data": {
-          "items": [
-            {
-              "title": "图书馆召开党总支理论学习中心组学习会",
-              "url": "https://library.gdut.edu.cn/info/1128/1917.htm",
-              "date": "2025/11/13",
-              "content": "11月10日，图书馆召开党总支理论学习中心组学习会，深入学习贯彻习近平新时代中国特色社会主义思想，聚焦高质量发展主题，全体中心组成员参加会议，会议由党总支书记主持。会上，大家围绕学习内容结合工作实际进行了交流研讨，明确了下一步工作方向。",
-              "key_words": ["图书馆", "理论学习", "专题党课"],
-              "label": "校园通知/学术活动/行政通知/社区公告",
-              "department": "图书馆"
-            },
-            {
-              "title": "2025年度学术讲座安排公示",
-              "url": "https://academic.gdut.edu.cn/info/2025/lecture.htm",
-              "date": "2025/11/12",
-              "content": "...",
-              "key_words": ["学术讲座", "专家", "报名"],
-              "label": "学术活动",
-              "department": "科研处"
-            }
-          ]
-        }
-      }
-      ​```
-      
-      #### 2. 其他三个页面  
-      
-      ​```json
-      {
-        "code": 200,
-        "msg": "success",
-        "data": {
-          "items": [
-            {
-              "title": "图书馆召开党总支理论学习中心组学习会",
-              "url": "https://library.gdut.edu.cn/info/1128/1917.htm",
-              "date": "2025/11/13",
-              "content": "...",
-              "key_words": ["图书馆", "理论学习", "专题党课"],
-              "department": "图书馆"
-            },
-            {
-              "title": "2025年度学术讲座安排公示",
-              "url": "https://academic.gdut.edu.cn/info/2025/lecture.htm",
-              "date": "2025/11/12",
-              "content": "...",
-              "key_words": ["学术讲座", "专家", "报名"],
-              "department": "科研处"
-            }
-          ]
-        }
-      }
-      ​```
-      
-      ### 字段说明  
-      
-      | 字段         | 说明                                             |
-      | ------------ | ------------------------------------------------ |
-      | `title`      | 内容标题                                         |
-      | `url`        | 内容详情链接                                     |
-      | `date`       | 发布日期                                         |
-      | `content`    | 内容详情                                         |
-      | `key_words`  | 关键词列表（部分场景未实际使用）                 |
-      | `label`      | 内容标签（仅通知公告页面返回，其他页面无此字段） |
-      | `department` | 发布部门                                         |
-      
-      
-      ```
-      
-      
+  - 表单模式模拟后台输入，以教务信息为例
+  
+    ```javascript
+    import academicInfoMock from "./mockAcademicData";
+    //模拟API请求函数
+    export const noticeApi = {
+    // 获取教务信息通知
+    getAcademicInfo: () => {
+    		// 实际项目中这里会是真实的API请求
+    	    // return axios.get('/api/academic-info');
+    		return new Promise((resolve) => {
+    		setTimeout(() => {
+    		resolve(academicInfoMock);
+    		}, 500); // 模拟网络延迟
+    	});
+    	},
+    };
+    ```
+  
     
-
+  
 - 后端
 
   - 实现了关键词与数据库中关键词的匹配算法

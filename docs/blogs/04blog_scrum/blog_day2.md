@@ -2,7 +2,9 @@
 
 ## 1. 团队会议
 
-==todo补充会议照片==
+因为各成员有不同的课程与实习安排，难以找到大家都在的线下时间，所以采用线上会议代替站立式会议。
+
+![](https://sevanthea7.oss-cn-beijing.aliyuncs.com/QGworks/202512031040498.png)
 
 ### 1）昨天已完成的工作
 
@@ -32,10 +34,10 @@
   - Vue嵌套路由架构设计中的缓存策略问题，需要根据路由层级关系正确放置 的位置，确保缓存的是实际切换的内容组件，而不是布局容器组件。
 
 - 后端
-  - 不同信息网站的页面结构差异较大，适配规则需要针对性编写，通用化不够
+  - 不同信息网站的页面结构差异较大，适配规则需要针对性编写，通用化不够。
 
 - 测试
-  - 部分功能目前尚未稳定上线，影响测试覆盖率，需要等待前后端进一步联调
+  - 部分功能目前尚未稳定上线，影响测试覆盖率，需要等待前后端进一步联调。
 
 ## 2. 项目燃尽图
 
@@ -55,7 +57,15 @@
 
 - 相关联issue见commit记录中`#`后链接内容
 
-- 接口文档与返回格式文档见 `docs/api_doc.md` 与 `docs/return_doc.md`
+  - 主要相关任务：
+
+    https://github.com/sevanthea7/GdutInfoHub/issues/28
+
+    https://github.com/sevanthea7/GdutInfoHub/issues/12
+
+    https://github.com/sevanthea7/GdutInfoHub/issues/32
+
+- 接口文档与返回格式文档见 `docs/api_doc.md` 与 `docs/return_doc.md`，暂未更新
 
 ## 4. 运行截图
 
@@ -63,8 +73,50 @@
 
   - 前端项目初始化完成
 
+    ```javascript
+  import { defineConfig, loadEnv } from "vite";
+    import path from "path";
+    import vue from "@vitejs/plugin-vue";
+    import { viteMockServe } from "vite-plugin-mock";
     
-
+    export default defineConfig(({ mode, command }) => {
+      const env = loadEnv(mode, process.cwd());
+      const { VITE_APP_ENV } = env;
+    
+      return {
+        base: VITE_APP_ENV === "development" ? "/" : "/",
+        plugins: [
+          vue(),
+          viteMockServe({
+            mockPath: "mock",
+            enable: command === "serve" && VITE_APP_ENV === "development", // 仅开发环境启用mock
+            logger: false, // 关闭mock日志（可选）
+          }),
+        ],
+        server: {
+          port: 5173,
+          host: true,
+          open: true,
+          proxy: {
+            "/api": {
+              target: "http://127.0.0.1:5000",
+              changeOrigin: true,
+              // 后端接口带/api前缀，无需rewrite！
+              // 如果后端接口不带/api，才需要：rewrite: (path) => path.replace(/^\/api/, "")
+            },
+          },
+        },
+        resolve: {
+          alias: {
+            "~": path.resolve(__dirname, "./"),
+            "@": path.resolve(__dirname, "./src"),
+          },
+          extensions: [".mjs", ".js", ".ts", ".jsx", ".tsx", ".json", ".vue"],
+        },
+      };
+    });
+    ```
+    
     ![](https://sevanthea7.oss-cn-beijing.aliyuncs.com/QGworks/202511252257981.png)
 
 - 后端
@@ -113,7 +165,7 @@
           resp.encoding = resp.apparent_encoding
           soup = BeautifulSoup(resp.text, "html.parser")
           
-          content_div = soup.select_one("div.nr-info div.v_news_content")
+          content_div = soup.select_one("div.nr-info div.v_news_content")	# 正文内容区域在这部分的所有p标签里
           if content_div:
               paragraphs = [p.get_text(strip=True) for p in content_div.find_all("p")]
               content = "\n".join(paragraphs)
@@ -130,12 +182,12 @@
               articles = get_page_urls(next_page)
               for article in articles:
                   article["content"] = get_article_content(article["url"])
-                  results.append(article)
+                  results.append(article)	# 添加爬取到的内容
               
               resp = requests.get(next_page, headers=headers)
               resp.encoding = resp.apparent_encoding
               soup = BeautifulSoup(resp.text, "html.parser")
-              next_link = soup.select_one("span.p_next a")
+              next_link = soup.select_one("span.p_next a")	# 得到下一页的链接
               if next_link:
                   next_page = urljoin(next_page, next_link['href'])
               else:
@@ -149,15 +201,14 @@
       
       ```
 
-      
-
-    ![](https://sevanthea7.oss-cn-beijing.aliyuncs.com/QGworks/202511252257574.png)
-
-  - 数据清洗完成，示例数据可见
-
-    - 数据清洗更新代码
-
-      ```python
+    
+![](https://sevanthea7.oss-cn-beijing.aliyuncs.com/QGworks/202511252257574.png)
+    
+- 数据清洗完成，示例数据可见
+  
+  - 数据清洗更新代码
+  
+    ```python
       import json
       import re
       import os
@@ -197,14 +248,10 @@
       
       
       ```
-
-      
+  
 
   ![](https://sevanthea7.oss-cn-beijing.aliyuncs.com/QGworks/202511252254952.png)
 
-  
-
-  
 
 ## 5. 每人每日总结
 
@@ -221,10 +268,6 @@
   - 徐伊彤：今天主要完成爬虫数据的清洗逻辑编写，包括正则规则整理、文本异常处理、字段过滤与结构化转换。在调试过程中，对部分网页结构不一致的情况进行了适配，使处理脚本更加稳健。通过对多批测试数据的清洗，确保最终输出的结构化数据可供知识库模块直接使用。
   - 曾钰仪：今天与数据清洗同学协作，完成了爬虫数据的清洗流程验证，并补充了部分更严格的文本处理规则。同时同步检查了清洗结果与知识库结构之间的字段匹配情况，确保后续知识库的构建不会出现数据缺失或格式错误。为后续接口对接工作打下了基础。
 
-今天与数据清洗同学协作，完成了爬虫数据的清洗流程验证，并补充了部分更严格的文本处理规则。同时同步检查了清洗结果与知识库结构之间的字段匹配情况，确保后续知识库的构建不会出现数据缺失或格式错误。为后续接口对接工作打下了基础。
-
 - 测试
   - 戴军霞：今天主要完成项目各代码文件格式、命名规范及可读性的检查工作，重点关注模块划分、注释规范及文件结构的整洁性。整理了需要在后续版本中改进的规范问题，并为下一阶段的测试计划编写提供了基础依据。
-
-今天主要完成项目各代码文件格式、命名规范及可读性的检查工作，重点关注模块划分、注释规范及文件结构的整洁性。整理了需要在后续版本中改进的规范问题，并为下一阶段的测试计划编写提供了基础依据。
 
