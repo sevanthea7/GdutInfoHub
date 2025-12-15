@@ -66,7 +66,8 @@
 import { ref, onMounted, nextTick } from "vue";
 import noSend from "../assets/images/noSend.png";
 import send from "../assets/images/send.png";
-import { onActivated, onDeactivated } from "vue";
+import { getStreamAnswer } from "@/api/question";
+import { onActivated } from "vue";
 
 // 接收父组件传递的初始问题内容
 const props = defineProps({
@@ -92,14 +93,17 @@ const currentTime = ref("");
 
 // 返回主页
 const handleBack = () => {
-  if (isStreaming.value) {
-    // 可以在这里添加取消请求的逻辑
-    console.log("取消流式请求");
-  }
   emit("back");
 };
 
 onMounted(() => {
+  // 获取本地存储的问答记录
+  chatHistory.value = JSON.parse(sessionStorage.getItem("chatHistory")) || [];
+  // 自动滚动到最新消息 （确保DOM更新完成后执行）
+  nextTick(() => {
+    scrollToBottom();
+  });
+
   if (props.content.trim()) {
     const now = new Date();
     const timeStr = formatTime(now);
@@ -110,6 +114,13 @@ onMounted(() => {
     });
     sendStreamRequest(props.content);
   }
+});
+
+onActivated(() => {
+  // 每次打开页面自动滚动到最新消息
+  nextTick(() => {
+    scrollToBottom();
+  });
 });
 
 // 发送问题
@@ -138,19 +149,9 @@ const sendStreamRequest = async (question) => {
   currentTime.value = formatTime(new Date());
 
   try {
-    const response = await fetch("/api/stream", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ question: question.trim() }),
-    });
+    const response = await getStreamAnswer({ question: question.trim() });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    console.log("响应体:", response);
+    // console.log("响应体:", response);
     // 处理流式响应
     await processRealStream(response);
   } catch (error) {
@@ -161,11 +162,11 @@ const sendStreamRequest = async (question) => {
   }
 };
 
-// 处理真正的流式数据
+// 处理流式响应
 const processRealStream = async (response) => {
   const reader = response.body.getReader();
   const decoder = new TextDecoder("utf-8");
-  let hasContent = false;
+  let receivedText = "";
 
   try {
     while (true) {
@@ -173,25 +174,20 @@ const processRealStream = async (response) => {
       if (done) break;
 
       const chunk = decoder.decode(value, { stream: true });
-
-      // 检查状态标记
-      if (chunk.includes("[STATUS]NO_CONTENT")) {
-        streamingContent.value = "抱歉，无法理解您的问题。";
-      } else if (chunk.includes("[STATUS]NO_MATCHING_CONTENT")) {
-        streamingContent.value = "抱歉，未找到相关内容。";
-      } else {
-        hasContent = true;
-        streamingContent.value += chunk;
-      }
+      receivedText += chunk;
+      streamingContent.value = receivedText;
 
       nextTick(scrollToBottom);
     }
 
-    // 如果整个流式过程都没有实际内容
-    if (!hasContent && !streamingContent.value) {
+    // 流结束后再判断是否有实际内容,处理后端返回空的问题
+    const hasMeaningfulContent = receivedText.trim().length > 0;
+
+    if (!hasMeaningfulContent) {
       streamingContent.value = "抱歉，未找到相关内容。";
     }
   } finally {
+    // 释放对 ReadableStream 的锁定的方法
     reader.releaseLock();
   }
 };
@@ -204,6 +200,8 @@ const completeStreamResponse = () => {
       content: streamingContent.value,
       time: currentTime.value,
     });
+    // 问答记录存储到本地
+    sessionStorage.setItem("chatHistory", JSON.stringify(chatHistory.value));
   }
 
   isStreaming.value = false;

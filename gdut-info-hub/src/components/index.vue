@@ -93,13 +93,13 @@ onMounted(() => {
   updateGreeting();
 });
 
-onActivated(() => {
+/* onActivated(() => {
   console.log("IndexQuestionAnswer activated");
 });
 
 onDeactivated(() => {
   console.log("IndexQuestionAnswer deactivated");
-});
+}); */
 
 const updateGreeting = () => {
   const currentTime = new Date();
