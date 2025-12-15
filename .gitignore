@@ -1,3 +1,4 @@
 *.pyc
 src/crawler/LLM_api/api_keys.py
 .idea/
+.pytest_cache/

@@ -2,7 +2,9 @@
 
 ## 1. 团队会议
 
-==todo补充会议照片==
+因为各成员有不同的课程与实习安排，难以找到大家都在的线下时间，所以采用线上会议代替站立式会议。
+
+![](https://sevanthea7.oss-cn-beijing.aliyuncs.com/QGworks/202512031041665.png)
 
 ### 1）昨天已完成的工作
 
@@ -52,6 +54,18 @@
 - 签入记录链接：https://github.com/sevanthea7/GdutInfoHub/commits/main/
 
 - 相关联issue见commit记录中`#`后链接内容
+
+  - 主要相关任务：
+
+    https://github.com/sevanthea7/GdutInfoHub/issues/5
+
+    https://github.com/sevanthea7/GdutInfoHub/issues/11
+
+    https://github.com/sevanthea7/GdutInfoHub/issues/12
+
+    https://github.com/sevanthea7/GdutInfoHub/issues/21
+
+    https://github.com/sevanthea7/GdutInfoHub/issues/29
 
 - 接口文档与返回格式文档见 `docs/api_doc.md` 与 `docs/return_doc.md`
 
