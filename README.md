@@ -76,37 +76,37 @@ bash scripts/start.sh
 
 该方式适合希望完全理解项目结构或进行调试、学习的用户。
 
-### 1️⃣ 克隆项目
+#### 1️⃣ 克隆项目
 
 ```bash
 git clone https://github.com/sevanthea7/GdutInfoHub.git
 ```
 
-### 2️⃣ 安装依赖（首次使用）
+#### 2️⃣ 安装依赖（首次使用）
 
-#### 前端依赖
+##### 前端依赖
 
 ```bash
 cd GdutInfoHub/gdut-info-hub
 npm install
 ```
 
-#### 后端依赖
+##### 后端依赖
 
 ```bash
 pip install volcengine-python-sdk[ark] jieba flask
 ```
 
-### 3️⃣ 启动项目
+#### 3️⃣ 启动项目
 
-#### 启动前端
+##### 启动前端
 
 ```bash
 cd GdutInfoHub/gdut-info-hub
 npm run dev
 ```
 
-#### 启动后端
+##### 启动后端
 
 ```bash
 python -m src.app.app
